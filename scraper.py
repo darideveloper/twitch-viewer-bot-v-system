@@ -1,4 +1,5 @@
 import os
+import shutil
 from scraping_manager.automate import WebScraping
 
 class TwitchBot (WebScraping):
@@ -17,7 +18,8 @@ class TwitchBot (WebScraping):
         self.password = password
         self.stream_link = stream_link
         self.login_link = "https://www.twitch.tv/login"
-        self.chrome_folder = os.path.join (os.path.dirname(__file__), "chrome_data", "User Data")
+        self.chrome_folder = os.path.join (os.path.dirname(__file__), "chrome_data", user)
+        self.chrome_default_folder = os.path.join (os.path.dirname(__file__), "chrome_data", "default")
         
         self.selectors = {
             "login_user": "#login-username",
@@ -25,9 +27,19 @@ class TwitchBot (WebScraping):
             "login_submit": 'button[data-a-target="passport-login-button"]'
         }
         
+        self.__create_chrome_folder__ ()
+        
         # Open browser
         super().__init__ (chrome_folder=self.chrome_folder)
         
+    def __create_chrome_folder__ (self):
+        """ Create chrome folder for the current user, if not exists """
+        
+        if not os.path.isdir (self.chrome_folder):
+            print (f"Preparing for the user {self.user}, please wait...")
+            shutil.copytree (self.chrome_default_folder, self.chrome_folder)
+        
+    
     def login (self, wait_login=True):
         """ Login to twitch account
 
@@ -45,6 +57,6 @@ class TwitchBot (WebScraping):
         
         # Wait for manual login required
         if wait_login:
-            input (f"Usuario: {self.user}. Enter para continuar...")
+            input (f"Logging in for user {self.user}. Press enter to continue...")
     
     
