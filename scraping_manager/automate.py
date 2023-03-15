@@ -643,3 +643,7 @@ class WebScraping ():
                 break
             else: 
                 time.sleep (0.5)
+                
+    def clean_input (self, selector):
+        elem = self.get_elem(selector)
+        self.driver.execute_script("arguments[0].value = '';", elem)

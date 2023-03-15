@@ -1,5 +1,6 @@
 import os
-import shutil
+import time
+from distutils.dir_util import copy_tree
 from scraping_manager.automate import WebScraping
 
 class TwitchBot (WebScraping):
@@ -27,6 +28,7 @@ class TwitchBot (WebScraping):
             "login_submit": 'button[data-a-target="passport-login-button"]'
         }
         
+        # Create  chrome folder if not exists
         self.__create_chrome_folder__ ()
         
         # Open browser
@@ -37,10 +39,10 @@ class TwitchBot (WebScraping):
         
         if not os.path.isdir (self.chrome_folder):
             print (f"Preparing for the user {self.user}, please wait...")
-            shutil.copytree (self.chrome_default_folder, self.chrome_folder)
+            copy_tree (self.chrome_default_folder, self.chrome_folder)
+            time.sleep (5)
         
-    
-    def login (self, wait_login=True):
+    def __login__ (self, wait_login=True):
         """ Login to twitch account
 
         Args:
@@ -49,14 +51,32 @@ class TwitchBot (WebScraping):
         
         # Load login page
         self.set_page (self.login_link)
+        self.refresh_selenium ()
         
-        # Login
-        self.send_data (self.selectors["login_user"], self.user)
-        self.send_data (self.selectors["login_password"], self.password)
-        self.click_js (self.selectors["login_submit"])
+        current_page = self.driver.current_url
+        if current_page == self.login_link:
+            
+            # Clean inputs
+            self.clean_input (self.selectors["login_user"])
+            self.clean_input (self.selectors["login_password"])
+            self.refresh_selenium ()
+            
+            # Login if itys required
+            self.send_data (self.selectors["login_user"], self.user)
+            self.send_data (self.selectors["login_password"], self.password)
+            self.click_js (self.selectors["login_submit"])
+            
+            # Wait for manual login required
+            if wait_login:
+                input (f"Logging in for user {self.user}. Press enter to continue...")
+                
+        else:
+            
+            print (f"user {self.user} already logged in")
         
-        # Wait for manual login required
-        if wait_login:
-            input (f"Logging in for user {self.user}. Press enter to continue...")
-    
-    
+    def auto_run (self):
+        
+        self.__login__ ()
+        
+        print ("running...")
+        time.sleep (300)
