@@ -1,5 +1,5 @@
 import api
-from scraper import TwitchBot
+from viwerbot import ViwerBot
 from threading import Thread
 
 def main (): 
@@ -10,7 +10,7 @@ def main ():
     # Start scrapers and crate chrome data folders
     threads = []
     for user, password in active_users.items():
-        twitch_bot = TwitchBot (user, password, "https://www.twitch.tv/juansguarnizo")
+        twitch_bot = ViwerBot (user, password, "https://www.twitch.tv/juansguarnizo")
         threads.append(Thread (target=twitch_bot.auto_run))
         
     # Start threads
