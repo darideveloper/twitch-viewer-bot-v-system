@@ -2,7 +2,7 @@ import os
 from api import Api
 from scraping_manager.automate import WebScraping
 
-class ViwerBot (WebScraping):
+class BotsManager (WebScraping):
     """ Watch Twitch stream with a multiple users, using cookies to login """
     
     def __init__ (self):     
@@ -14,6 +14,11 @@ class ViwerBot (WebScraping):
         self.settings = api.get_settings ()
         self.proxies = api.get_proxies ()
         self.streams = api.get_streams ()
-        print ()
+        
+        
+if __name__ == "__main__":
+    # Test class
+    
+    BotsManager ()
     
     

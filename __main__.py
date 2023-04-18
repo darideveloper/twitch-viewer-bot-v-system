@@ -1,5 +1,5 @@
 import api
-from viwerbot import ViwerBot
+from botsmanager import ViwerBot
 from threading import Thread
 
 def main (): 
