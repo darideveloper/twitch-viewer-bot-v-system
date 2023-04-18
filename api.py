@@ -18,7 +18,7 @@ class Api ():
             [
                 {
                     "name": "DariDeveloper",
-                    "cookies": [],
+                    "cookies": [...],
                     "is_active": true,
                     "last_update": "2023-04-17T23:29:07.083Z"
                 }
