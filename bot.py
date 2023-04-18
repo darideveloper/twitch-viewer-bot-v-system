@@ -3,15 +3,16 @@ from time import sleep
 from threading import Thread
 from scraping_manager.automate import WebScraping
 
-class BotsManager (WebScraping):
+class Bot (WebScraping):
     """ Bot for watch Twitch stream, using cookies to login """
     
-    def __init__ (self, cookies:list, stream:str,
+    def __init__ (self, username:str, cookies:list, stream:str,
                   proxy_host:str, proxy_port:int, proxy_user:str="", proxy_pass:str="",
                   headless:bool=False, timeout:int=60):
         """ Contructor of class. Start viwer bot
 
         Args:
+            username (str): name of user to login
             cookies (list): cookies for login, generated with chrome extension "EditThisCookie"
             stream (str): user stream to watch
             proxy_host (str): proxy host
@@ -23,28 +24,43 @@ class BotsManager (WebScraping):
         """
         
         # Save class variables and start browser
+        self.username = username
+        self.cookies = cookies
+        self.proxy_host = proxy_host
+        self.proxy_port = proxy_port
+        self.proxy_user = proxy_user
+        self.proxy_pass = proxy_pass
+        self.headless = headless
         self.stream = stream
         self.timeout = timeout
         self.twitch_url = f"https://www.twitch.tv/"
         self.twitch_stream = f"https://www.twitch.tv/{self.stream}"
         self.status = "running"
         
-        super ().__init__ (self.twitch_url, headless, 
-                           proxy_server=proxy_host, proxy_port=proxy_port,
-                           proxy_user=proxy_user, proxy_pass=proxy_pass,
-                           cookies=cookies)
+        # Start thread for start browser in background
+        therad_start_browser = Thread (target=self.__start_bot__)
+        therad_start_browser.start ()
         
-        self.set_page (self.twitch_stream)
-        
-        # Start thread for close browser
-        therad_end_browser = Thread (target=self.__end_browser__)
+        # Start thread for close browser in background
+        therad_end_browser = Thread (target=self.__end_bot__)
         therad_end_browser.start ()
         
         while True:
             print (self.status)
             sleep (1)
+            
+    def __start_bot__ (self):
+        """ Start browser and watch stream """
         
-    def __end_browser__ (self):
+        
+        super ().__init__ (self.twitch_url, self.headless, 
+                           proxy_server=self.proxy_host, proxy_port=self.proxy_port,
+                           proxy_user=self.proxy_user, proxy_pass=self.proxy_pass,
+                           cookies=self.cookies)
+        
+        self.set_page (self.twitch_stream)
+        
+    def __end_bot__ (self):
         """ Close when time out end """
         
         timeout_seconds = self.timeout * 60
