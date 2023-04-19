@@ -18,6 +18,8 @@ class BotsManager ():
         self.streams = api.get_streams ()
         
         bots_running = {}
+        for streams in self.streams:
+            bots_running[streams] = []
         
         # Create bots to each stream
         for stream in self.streams:
@@ -62,16 +64,15 @@ class BotsManager ():
                         print (f"\tPage not loaded with proxy: {proxy['host']}:{proxy['port']}:{proxy['user']}:{proxy['password']}. Retrying...")
                         
                         
-            
-                print (f"\tBot: {bot.username} running...")
-                
-                # Save bot instance
-                if stream not in bots_running:
-                    bots_running[stream] = [bot]
-                else:
+                if started:
+                    print (f"\tBot: {bot.username} running...")
+                    
+                    # Save bot instance
                     bots_running[stream].append (bot) 
                 
-            print (f'\tBots running: {self.settings["viwers_stream"]}')           
+        print (f'\nBots running: ')
+        for stream, bots in bots_running.items():
+            print (f"\t{stream}: {len(bots)}")    
         
     def __get_random_proxy__ (self) -> dict:
         """ Get random proxy from list and remove it
