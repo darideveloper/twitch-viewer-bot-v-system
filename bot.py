@@ -41,13 +41,12 @@ class Bot (WebScraping):
         therad_start_browser = Thread (target=self.__start_bot__)
         therad_start_browser.start ()
         
+        # # Start bot
+        # self.__start_bot__ ()
+        
         # Start thread for close browser in background
         therad_end_browser = Thread (target=self.__end_bot__)
         therad_end_browser.start ()
-        
-        while True:
-            print (self.status)
-            sleep (1)
             
     def __start_bot__ (self):
         """ Start browser and watch stream """
