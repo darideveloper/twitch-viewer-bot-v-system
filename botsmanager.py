@@ -22,6 +22,9 @@ class BotsManager ():
         # Create bots to each stream
         for stream in self.streams:
             
+            if not self.proxies:
+                continue
+            
             stream_users = self.users.copy ()
             
             print (f"Stream: {stream}")
@@ -33,15 +36,33 @@ class BotsManager ():
                 user = random.choice (stream_users)
                 stream_users.remove (user)
                 
-                # Get random proxy
-                proxy = random.choice (self.proxies)
-                self.proxies.remove (proxy)
-                
-                # Create bot
-                bot = Bot (user["name"], user["cookies"], stream,
-                           proxy["host"], proxy["port"], proxy["user"], proxy["password"],
-                           timeout=10)
-                
+                # Valñidate if bot started and catch error
+                started = False
+                while not started:
+                                        
+                    # Get random proxy and catch
+                    proxy = self.__get_random_proxy__ ()
+                    if not self.proxies:
+                        print (f"\tNo more proxies available. Bot: {user['name']} stopped.")
+                        break
+                    
+                    # Create and start bot
+                    bot = Bot (user["name"], user["cookies"], stream,
+                            proxy["host"], proxy["port"], proxy["user"], proxy["password"],
+                            timeout_stream=10)
+                    started = bot.auto_run ()    
+                    
+                    # Detect if bot started and get status  
+                    status = bot.status
+                    if started:
+                        break
+                    
+                    # Catch proxy error
+                    if status == "proxy error":
+                        print (f"\tPage not loaded with proxy: {proxy['host']}:{proxy['port']}:{proxy['user']}:{proxy['password']}. Retrying...")
+                        
+                        
+            
                 print (f"\tBot: {bot.username} running...")
                 
                 # Save bot instance
@@ -52,6 +73,21 @@ class BotsManager ():
                 
             print (f'\tBots running: {self.settings["viwers_stream"]}')           
         
+    def __get_random_proxy__ (self) -> dict:
+        """ Get random proxy from list and remove it
+
+        Returns:
+            dict: random proxy
+        """
+        
+        # Validate if there are proxies
+        if not self.proxies:
+            return False
+        
+        proxy = random.choice (self.proxies)
+        self.proxies.remove (proxy)
+        
+        return proxy
         
 if __name__ == "__main__":
     # Test class
