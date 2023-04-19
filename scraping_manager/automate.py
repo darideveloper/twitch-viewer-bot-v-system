@@ -30,7 +30,7 @@ class WebScraping ():
                  proxy_server="", proxy_port="", proxy_user="", proxy_pass="",
                  chrome_folder="", user_agent=False, capabilities=False,
                  download_folder="", extensions=[], incognito=False, experimentals=True,
-                 start_killing=False, cookies={}):
+                 start_killing=False, start_openning:bool=True):
         """ Constructor of the class
 
         Args:
@@ -48,6 +48,7 @@ class WebScraping ():
             incognito (bool, optional): Open chrome in incognito mode. Defaults to False.
             experimentals (bool, optional): Activate the experimentals options. Defaults to True.
             start_killing (bool, optional): Kill chrome process before start. Defaults to False.
+            start_openning (bool, optional): Open chrome window before start. Defaults to True.
         """
 
         self.basetime = 1
@@ -67,6 +68,7 @@ class WebScraping ():
         self.__extensions__ = extensions
         self.__incognito__ = incognito
         self.__experimentals__ = experimentals
+        self.__start_openning__ = start_openning
         
         self.__web_page__ = None
 
@@ -78,7 +80,8 @@ class WebScraping ():
             print("Ok\n")
 
         # Create and instance of the web browser
-        self.__set_browser_instance__()
+        if self.__start_openning__:
+            self.__set_browser_instance__()
 
         # Get current file name
         self.current_file = os.path.basename(__file__)
