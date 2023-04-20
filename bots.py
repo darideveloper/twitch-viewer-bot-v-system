@@ -35,7 +35,7 @@ class BotsManager ():
             
             stream_users = self.users.copy ()
             
-            print (f"Stream: {stream}")
+            print (f"Stream: {stream}\n\tstarting bots...")
             
             # Generate specific number of bots, from settings
             for _ in range (self.settings["viwers_stream"]):
