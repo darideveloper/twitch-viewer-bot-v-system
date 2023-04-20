@@ -1,7 +1,13 @@
+import os
 import json
+from dotenv import load_dotenv
 from time import sleep
 from threading import Thread
 from scraping_manager.automate import WebScraping
+
+load_dotenv ()
+
+DEBUG = os.getenv ("DEBUG") == "true"
 
 class Bot (WebScraping):
     """ Bot for watch Twitch stream, using cookies to login """
@@ -20,9 +26,7 @@ class Bot (WebScraping):
             proxy_user (str, optional): proxy user. Defaults to ""
             proxy_pass (str, optional): proxy password. Defaults to ""
             headless (bool, optional): use headless mode (hide browser). Defaults to False
-            timeout_stream (int, optional): time to wait (in minutes) before close browser. Defaults to 60
-
-        
+            timeout_stream (int, optional): time to wait (in minutes) before close browser. Defaults to 60        
         """
         
         # Save class variables and start browser
@@ -100,6 +104,10 @@ class Bot (WebScraping):
             
             # Open stream
             self.set_page (self.twitch_url_stream)
+            
+            if DEBUG:
+                self.screenshot ("ss.png")
+            
             return True
         
     def __end_bot__ (self, force:bool=False):

@@ -13,3 +13,4 @@ db.*
 *.pyc
 chrome_data
 *.csv
+*.png
