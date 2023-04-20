@@ -95,6 +95,9 @@ class Bot (WebScraping):
             self.status = error
             return False
         else:
+            # Load cookies
+            self.set_cookies (self.cookies)
+            
             # Open stream
             self.set_page (self.twitch_url_stream)
             return True
