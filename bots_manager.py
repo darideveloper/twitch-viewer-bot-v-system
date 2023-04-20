@@ -12,18 +12,21 @@ class BotsManager ():
         # Connect to api
         api = Api ()
         
+        self.streams = api.get_streams ()
+        
+        # Show error and stop when no stream founnd
+        if not self.streams:
+            print (f"No streams found.")
+            return None
+        
         self.users = api.get_users ()
         self.settings = api.get_settings ()
         self.proxies = api.get_proxies ()
-        self.streams = api.get_streams ()
         
         bots_running = {}
         for streams in self.streams:
             bots_running[streams] = []
             
-        if not self.streams:
-            print (f"No streams found.")
-        
         # Create bots to each stream
         for stream in self.streams:
             
