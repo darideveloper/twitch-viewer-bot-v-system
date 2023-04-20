@@ -57,7 +57,7 @@ class BotsManager ():
                     # Create and start bot
                     bot = Bot (user["name"], user["cookies"], stream,
                             proxy["host"], proxy["port"], proxy["user"], proxy["password"],
-                            timeout_stream=10)
+                            timeout_stream=10, headless=self.settings["headless"])
                     started = bot.auto_run ()    
                     
                     # Detect if bot started and get status  
