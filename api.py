@@ -61,11 +61,18 @@ class Api ():
         setting_formatted = {}
         for setting in settings:
             key = setting["fields"]["name"]
-            value = setting["fields"]["value"]
+            value = setting["fields"]["value"].lower().strip()
             
             # Convert values to int if possible
             if value.isdigit ():
                 value = int (value)
+                
+            # Convert to bool if is possible
+            if value == "true":
+                value = True
+            
+            if value == "false":
+                value = False
             
             setting_formatted[key] = value
             

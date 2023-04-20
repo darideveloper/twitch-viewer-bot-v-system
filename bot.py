@@ -45,7 +45,8 @@ class Bot (WebScraping):
         
         # Css selectors
         self.selectors = {
-            "twitch-logo": 'a[aria-label="Twitch Home"]' 
+            "twitch-logo": 'a[aria-label="Twitch Home"]',
+            "twitch-login-btn": 'button[data-a-target="login-button"]'
         }
     
     def auto_run (self) -> str:
@@ -91,23 +92,25 @@ class Bot (WebScraping):
         else:
             if not load_elem:
                 error = "proxy error"
+                
+        # Load cookies
+        self.set_cookies (self.cookies)
         
-        # TODO: Validate if account loaded and catch error
+        # Open stream
+        self.set_page (self.twitch_url_stream)
         
+        # Validte session with cookies
+        login_button = self.get_elems (self.selectors["twitch-login-btn"])
+        if login_button:
+            error = "cookie error"
+        
+        if DEBUG:
+            self.screenshot ("ss.png")
         if error:
             # Update status
             self.status = error
             return False
         else:
-            # Load cookies
-            self.set_cookies (self.cookies)
-            
-            # Open stream
-            self.set_page (self.twitch_url_stream)
-            
-            if DEBUG:
-                self.screenshot ("ss.png")
-            
             return True
         
     def __end_bot__ (self, force:bool=False):

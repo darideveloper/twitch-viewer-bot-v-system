@@ -120,7 +120,10 @@ class WebScraping ():
             cookies_formatted.append(cookie)
 
         for cookie in cookies_formatted:
-            self.driver.add_cookie(cookie)
+            try:
+                self.driver.add_cookie(cookie)
+            except:
+                pass
 
     def __set_browser_instance__(self):
         """

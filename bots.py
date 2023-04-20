@@ -67,8 +67,11 @@ class BotsManager ():
                     
                     # Catch proxy error
                     if status == "proxy error":
-                        print (f"\tPage not loaded with proxy: {proxy['host']}:{proxy['port']}:{proxy['user']}:{proxy['password']}. Retrying...")
+                        print (f"\tBot error with proxy: {proxy['host']}:{proxy['port']}:{proxy['user']}:{proxy['password']}. Retrying...")
                         
+                    if status == "cookie error":
+                        print (f"\tBot error with user: {user['name']}. Update the cookies.")
+                        break
                         
                 if started:
                     print (f"\tBot: {bot.username} running...")
@@ -101,5 +104,3 @@ if __name__ == "__main__":
     # Test class
     
     BotsManager ()
-    
-    
