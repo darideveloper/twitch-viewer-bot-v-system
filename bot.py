@@ -12,7 +12,7 @@ DEBUG = os.getenv ("DEBUG") == "true"
 class Bot (WebScraping):
     """ Bot for watch Twitch stream, using cookies to login """
     
-    def __init__ (self, username:str, cookies:list, stream:str,
+    def __init__ (self, username:str, cookies:list, stream:str, 
                   proxy_host:str, proxy_port:int, proxy_user:str="", proxy_pass:str="",
                   headless:bool=False, timeout_stream:int=60) -> bool:
         """ Contructor of class. Start viwer bot
@@ -32,13 +32,15 @@ class Bot (WebScraping):
         # Save class variables and start browser
         self.username = username
         self.cookies = cookies
+        self.stream = stream
         self.proxy_host = proxy_host
         self.proxy_port = proxy_port
         self.proxy_user = proxy_user
         self.proxy_pass = proxy_pass
         self.headless = headless
-        self.stream = stream
         self.timeout_stream = timeout_stream
+        
+        # Urls and status
         self.twitch_url = f"https://www.twitch.tv/"
         self.twitch_url_stream = f"https://www.twitch.tv/{self.stream}"
         self.status = "running"
@@ -124,6 +126,7 @@ class Bot (WebScraping):
             timeout_seconds = self.timeout_stream * 60
             sleep (timeout_seconds)
             self.status = "ended"    
+            print (f"\tBot ended: {self.username}")
                 
         self.driver.quit ()
 

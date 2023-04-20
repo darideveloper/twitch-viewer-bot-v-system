@@ -57,7 +57,8 @@ class BotsManager ():
                     # Create and start bot
                     bot = Bot (user["name"], user["cookies"], stream,
                             proxy["host"], proxy["port"], proxy["user"], proxy["password"],
-                            timeout_stream=10, headless=self.settings["headless"])
+                            timeout_stream=self.settings["timeout-min"], 
+                            headless=self.settings["headless"])
                     started = bot.auto_run ()    
                     
                     # Detect if bot started and get status  
@@ -83,6 +84,7 @@ class BotsManager ():
             print (f'\nBots running: ')
             for stream, bots in bots_running.items():
                 print (f"\t{stream}: {len(bots)}")    
+        print ()
             
     def __get_random_proxy__ (self) -> dict:
         """ Get random proxy from list and remove it

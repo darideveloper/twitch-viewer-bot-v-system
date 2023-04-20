@@ -107,11 +107,20 @@ class WebScraping ():
                 del cookie["expirationDate"]
 
             # remove unnecessary keys
-            del cookie["hostOnly"]
-            del cookie["sameSite"]
-            del cookie["session"]
-            del cookie["storeId"]
-            del cookie["id"]
+            if cookie.get ("hostOnly"):
+                del cookie["hostOnly"]
+            
+            if cookie.get ("sameSite"):
+                del cookie["sameSite"]
+            
+            if cookie.get ("session"):
+                del cookie["session"]
+            
+            if cookie.get ("storeId"):
+                del cookie["storeId"]
+            
+            if cookie.get ("id"):
+                del cookie["id"]
 
             # Fix domain
             if cookie["domain"].startswith("."):
