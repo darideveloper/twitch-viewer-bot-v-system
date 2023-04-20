@@ -26,6 +26,8 @@ class Api ():
             ]
         """
         
+        print ("getting users...")
+        
         # Get data from api
         url = f"{API_HOST}/users/"
         res = requests.get (url)
@@ -47,6 +49,8 @@ class Api ():
             
             Example: {"viwers_stream": 20}
         """
+        
+        print ("getting settings...")
         
         # Get data from api
         url = f"{API_HOST}/settings/"
@@ -86,6 +90,8 @@ class Api ():
             ]
         """
         
+        print ("getting proxies...")
+        
         # Get data from api
         url = f"{API_HOST}/proxies/"
         res = requests.get (url)
@@ -104,6 +110,8 @@ class Api ():
             
             Example:  ["DariDeveloper", "darideveloper2"]
         """
+        
+        print ("getting streams...")
         
         # Get data from api
         url = f"{API_HOST}/streams/"
