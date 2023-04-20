@@ -3,7 +3,7 @@ import json
 from dotenv import load_dotenv
 from time import sleep
 from threading import Thread
-from scraping_manager.automate import WebScraping
+from scraping.automate import WebScraping
 
 load_dotenv ()
 
