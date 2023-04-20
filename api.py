@@ -4,10 +4,30 @@ from dotenv import load_dotenv
 
 load_dotenv ()
 API_HOST = os.getenv ("API_HOST")
-API_KEY = os.getenv ("API_KEY")
+TOKEN = os.getenv ("TOKEN")
 
 class Api ():
     
+    def __requests_url__ (self, endpoint:str) -> requests.get:
+        """ Request data from specific endpoint and and quit if error happens
+
+        Args:
+            endpoint (str): endpoint to request, like "users" or "settings"
+
+        Returns:
+            requests.get: response of requests to the endpoint
+        """
+        
+        # Request data to specific url
+        url = f"{API_HOST}/{endpoint}/?token={TOKEN}"
+        res = requests.get (url)
+        
+        if res.status_code == 200:
+            return res
+        else:
+            print ("Error requesting data from API. Check your token.")
+            quit ()
+        
     def get_users (self) -> list:
         """ Get twitch user for the bot, using the API
 
@@ -29,8 +49,7 @@ class Api ():
         print ("getting users...")
         
         # Get data from api
-        url = f"{API_HOST}/users/"
-        res = requests.get (url)
+        res = self.__requests_url__ ("users")
         users = res.json ()
         
         # filter active users
@@ -53,8 +72,7 @@ class Api ():
         print ("getting settings...")
         
         # Get data from api
-        url = f"{API_HOST}/settings/"
-        res = requests.get (url)
+        res = res = self.__requests_url__ ("settings")
         settings = res.json ()
     
         # Format settings
@@ -100,8 +118,7 @@ class Api ():
         print ("getting proxies...")
         
         # Get data from api
-        url = f"{API_HOST}/proxies/"
-        res = requests.get (url)
+        res = res = self.__requests_url__ ("proxies")
         proxies = res.json ()
         
         # Format proxies
@@ -121,8 +138,7 @@ class Api ():
         print ("getting streams...")
         
         # Get data from api
-        url = f"{API_HOST}/streams/"
-        res = requests.get (url)
+        res = self.__requests_url__ ("streams")
         return res.json ()
     
     
