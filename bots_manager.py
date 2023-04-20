@@ -20,6 +20,9 @@ class BotsManager ():
         bots_running = {}
         for streams in self.streams:
             bots_running[streams] = []
+            
+        if not self.streams:
+            print (f"No streams found.")
         
         # Create bots to each stream
         for stream in self.streams:
@@ -69,11 +72,12 @@ class BotsManager ():
                     
                     # Save bot instance
                     bots_running[stream].append (bot) 
-                
-        print (f'\nBots running: ')
-        for stream, bots in bots_running.items():
-            print (f"\t{stream}: {len(bots)}")    
         
+        if bots_running:
+            print (f'\nBots running: ')
+            for stream, bots in bots_running.items():
+                print (f"\t{stream}: {len(bots)}")    
+            
     def __get_random_proxy__ (self) -> dict:
         """ Get random proxy from list and remove it
 
