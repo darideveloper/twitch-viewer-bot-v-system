@@ -1,5 +1,6 @@
 import os
 import json
+import datetime
 from dotenv import load_dotenv
 from time import sleep
 from threading import Thread
@@ -123,7 +124,11 @@ class Bot (WebScraping):
         """
         
         if not force:
-            timeout_seconds = self.timeout_stream * 60
+            
+            # Calculate and sleep fime running
+            now = datetime.datetime.now ()
+            timeout = self.timeout_stream - now.minute
+            timeout_seconds = timeout * 60
             sleep (timeout_seconds)
             self.status = "ended"    
             print (f"\tBot ended: {self.username}")
