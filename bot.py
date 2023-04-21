@@ -71,6 +71,20 @@ class Bot (WebScraping):
         
         return started
         
+    def __is_proxy_working__ (self) -> bool:
+        """ Check test page to validate if proxy is working
+
+        Returns:
+            bool: True if proxy is working, False if not
+        """
+        
+        try:
+            self.set_page ("http://ipinfo.io/json")
+        except:
+            return False
+        else:
+            return True
+        
     def __start_bot__ (self) -> bool:
         """ Start browser and watch stream
 
@@ -84,31 +98,42 @@ class Bot (WebScraping):
         super().__init__ (headless=self.headless, time_out=30,
                           proxy_server=self.proxy_host, proxy_port=self.proxy_port, 
                           proxy_user=self.proxy_user, proxy_pass=self.proxy_pass)
-        self.set_page (self.twitch_url)
+
+        proxy_working = self.__is_proxy_working__ ()    
         
-        # Validate if page loaded and catch error
-        self.refresh_selenium ()
-        try:
-            load_elem = self.get_elems (self.selectors["twitch-logo"])
-        except:
-            error = "proxy error"
-        else:
-            if not load_elem:
+        if not proxy_working:
+            error = "proxy error"    
+        
+        if not error:
+            
+            # Validate if page loaded and catch error
+            try:
+                self.set_page (self.twitch_url)
+                self.refresh_selenium ()
+                load_elem = self.get_elems (self.selectors["twitch-logo"])
+            except:
                 error = "proxy error"
-                
-        # Load cookies
-        self.set_cookies (self.cookies)
+            else:
+                if not load_elem:
+                    error = "proxy error"            
         
-        # Open stream
-        self.set_page (self.twitch_url_stream)
+        if not error:
+            # Load cookies
+            self.set_cookies (self.cookies)
+            
+            # Open stream
+            self.set_page (self.twitch_url_stream)
+            
+            # Validte session with cookies
+            login_button = self.get_elems (self.selectors["twitch-login-btn"])
+            if login_button:
+                error = "cookie error"
         
-        # Validte session with cookies
-        login_button = self.get_elems (self.selectors["twitch-login-btn"])
-        if login_button:
-            error = "cookie error"
-        
+        # Take screenshot
         if DEBUG:
             self.screenshot ("ss.png")
+            
+        # Catch errors
         if error:
             # Update status
             self.status = error
