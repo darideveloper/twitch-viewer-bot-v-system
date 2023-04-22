@@ -93,7 +93,7 @@ class BotsManager ():
             dict: random proxy
         """
         
-        # Validate if there are proxies
+        # Validate if there are proxies free
         if not self.proxies:
             return False
         
