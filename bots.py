@@ -2,7 +2,11 @@ import os
 import random
 from api import Api
 from bot import Bot
-from threading import Thread
+from dotenv import load_dotenv
+
+load_dotenv ()
+
+DEBUG = os.getenv ("DEBUG") == "true"
 
 class BotsManager ():
     """ Watch Twitch stream with a multiple users, using cookies to login """
@@ -34,6 +38,10 @@ class BotsManager ():
                 continue
             
             stream_users = self.users.copy ()
+            
+            # Only 2 users in debug mode
+            if DEBUG:
+                stream_users = stream_users[:2]
             
             print (f"Stream: {stream}\n\tstarting bots...")
             
