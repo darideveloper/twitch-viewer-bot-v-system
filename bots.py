@@ -43,6 +43,7 @@ class BotsManager ():
             if DEBUG:
                 stream_users = stream_users[:2]
             
+            print ("")
             print (f"Stream: {stream}\n\tstarting bots...")
             
             # Generate specific number of bots, from settings
