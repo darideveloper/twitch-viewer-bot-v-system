@@ -145,7 +145,8 @@ class Bot (WebScraping):
             now = datetime.datetime.now ()
             timeout = self.timeout_stream - now.minute
             timeout_seconds = timeout * 60
-            sleep (timeout_seconds)
+            if timeout_seconds > 0:
+                sleep (timeout_seconds)
             self.status = "ended"    
             print (f"\tBot ended: {self.username}")
                 
