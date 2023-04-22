@@ -38,7 +38,7 @@ class BotsManager ():
             print (f"Stream: {stream}\n\tstarting bots...")
             
             # Generate specific number of bots, from settings
-            for _ in range (self.settings["viwers_stream"]):
+            while len(bots_running) < self.settings["viwers_stream"]:
                 
                 # Get random user
                 user = random.choice (stream_users)

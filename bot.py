@@ -71,15 +71,17 @@ class Bot (WebScraping):
         
         return started
         
-    def __is_proxy_working__ (self) -> bool:
-        """ Check test page to validate if proxy is working
+    def __load_twitch__ (self) -> bool:
+        """ Try to load twitch page and validate if proxy is working
 
         Returns:
-            bool: True if proxy is working, False if not
+            bool: True if twitch load, else False
         """
         
         try:
             self.set_page ("http://ipinfo.io/json")
+            self.set_page (self.twitch_url)
+            self.refresh_selenium ()
         except:
             return False
         else:
@@ -99,14 +101,10 @@ class Bot (WebScraping):
                           proxy_server=self.proxy_host, proxy_port=self.proxy_port, 
                           proxy_user=self.proxy_user, proxy_pass=self.proxy_pass)
 
-        proxy_working = self.__is_proxy_working__ ()    
+        proxy_working = self.__load_twitch__ ()    
         
         if not proxy_working:
             error = "proxy error"    
-        
-        if not error:
-            self.set_page (self.twitch_url)
-            self.refresh_selenium ()
             
         if not error:
             # Load cookies
