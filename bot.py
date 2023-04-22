@@ -105,18 +105,9 @@ class Bot (WebScraping):
             error = "proxy error"    
         
         if not error:
+            self.set_page (self.twitch_url)
+            self.refresh_selenium ()
             
-            # Validate if page loaded and catch error
-            try:
-                self.set_page (self.twitch_url)
-                self.refresh_selenium ()
-                load_elem = self.get_elems (self.selectors["twitch-logo"])
-            except:
-                error = "proxy error"
-            else:
-                if not load_elem:
-                    error = "proxy error"            
-        
         if not error:
             # Load cookies
             self.set_cookies (self.cookies)
