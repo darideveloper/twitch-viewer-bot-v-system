@@ -41,6 +41,9 @@ class BotsManager ():
             while len(bots_running) < self.settings["viwers_stream"]:
                 
                 # Get random user
+                if not stream_users:
+                    print (f"\tNo more users available for this stream.")
+                    break
                 user = random.choice (stream_users)
                 stream_users.remove (user)
                 
