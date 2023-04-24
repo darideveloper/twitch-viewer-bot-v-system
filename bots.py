@@ -28,8 +28,8 @@ class BotsManager ():
         self.proxies = api.get_proxies ()
         
         bots_running = {}
-        for streams in self.streams:
-            bots_running[streams] = []
+        for stream in self.streams:
+            bots_running[stream] = []
             
         # Create bots to each stream
         for stream in self.streams:
@@ -47,8 +47,8 @@ class BotsManager ():
             print (f"Stream: {stream}\n\tstarting bots...")
             
             # Generate specific number of bots, from settings
-            while len(bots_running) < self.settings["viwers_stream"]:
-                
+            while len(bots_running[stream]) < self.settings["viwers_stream"]:
+                                
                 # Get random user
                 if not stream_users:
                     print (f"\tNo more users available for this stream.")
