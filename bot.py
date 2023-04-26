@@ -16,7 +16,7 @@ class Bot (WebScraping):
     def __init__ (self, username:str, cookies:list, stream:str, 
                   proxy_host:str, proxy_port:int, proxy_user:str="", proxy_pass:str="",
                   headless:bool=False, timeout_stream:int=60,
-                  width:int=1920, height:int=1080) -> bool:
+                  width:int=1920, height:int=1080, take_screenshots:bool=False) -> bool:
         """ Contructor of class. Start viwer bot
 
         Args:
@@ -28,7 +28,10 @@ class Bot (WebScraping):
             proxy_user (str, optional): proxy user. Defaults to ""
             proxy_pass (str, optional): proxy password. Defaults to ""
             headless (bool, optional): use headless mode (hide browser). Defaults to False
-            timeout_stream (int, optional): time to wait (in minutes) before close browser. Defaults to 60        
+            timeout_stream (int, optional): time to wait (in minutes) before close browser. Defaults to 60    
+            width (int, optional): width of browser window. Defaults to 1920
+            height (int, optional): height of browser window. Defaults to 1080
+            take_screenshots (bool, optional): take screenshots in headless mode. Defaults to False    
         """
         
         # Save class variables and start browser
@@ -43,6 +46,7 @@ class Bot (WebScraping):
         self.timeout_stream = timeout_stream
         self.width = width
         self.height = height
+        self.take_screenshots = take_screenshots
         
         # Urls and status
         self.twitch_url = f"https://www.twitch.tv/"
@@ -123,7 +127,7 @@ class Bot (WebScraping):
                 error = "cookie error"
         
         # Take screenshot
-        if DEBUG:
+        if self.take_screenshots:
             self.screenshot ("ss.png")
             
         # Catch errors

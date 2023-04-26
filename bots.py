@@ -74,7 +74,8 @@ class BotsManager ():
                     bot = Bot (user["name"], user["cookies"], stream,
                             proxy["host"], proxy["port"], proxy["user"], proxy["password"],
                             timeout_stream=self.settings["timeout-min"], headless=headless, 
-                            width=self.settings["window-width"], height=self.settings["window-height"])
+                            width=self.settings["window-width"], height=self.settings["window-height"],
+                            take_screenshots=self.settings["screenshots"])
                     started = bot.auto_run ()    
                     
                     # Detect if bot started and get status  
