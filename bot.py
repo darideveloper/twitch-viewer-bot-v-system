@@ -58,7 +58,7 @@ class Bot (WebScraping):
             "twitch-logo": 'a[aria-label="Twitch Home"]',
             "twitch-login-btn": 'button[data-a-target="login-button"]',
             'start-stream-btn': 'button[data-a-target="player-overlay-mature-accept"]',
-            'stream-menu-btn': 'button[aria-label="Settings"]',
+            'stream-menu-btn': 'button[data-a-target="player-settings-button"]',
             'stream-quality-btn': 'button[data-a-target="player-settings-menu-item-quality"]',
             'stream-160p-btn': '[data-a-target="player-settings-menu"] > div:last-child input[name="player-settings-submenu-quality-option"]',
         }
