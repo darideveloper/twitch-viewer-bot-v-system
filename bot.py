@@ -50,6 +50,7 @@ class Bot (WebScraping):
         
         # Urls and status
         self.twitch_url = f"https://www.twitch.tv/"
+        self.twitch_url_login = f"https://www.twitch.tv/login/"
         self.twitch_url_stream = f"https://www.twitch.tv/{self.stream}"
         self.status = "running"
         
@@ -91,7 +92,7 @@ class Bot (WebScraping):
         
         try:
             self.set_page ("http://ipinfo.io/json")
-            self.set_page (self.twitch_url)
+            self.set_page (self.twitch_url_login)
             self.refresh_selenium ()
         except:
             return False
