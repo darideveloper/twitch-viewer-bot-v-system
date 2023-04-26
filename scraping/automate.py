@@ -30,7 +30,8 @@ class WebScraping ():
                  proxy_server="", proxy_port="", proxy_user="", proxy_pass="",
                  chrome_folder="", user_agent=False, capabilities=False,
                  download_folder="", extensions=[], incognito=False, experimentals=True,
-                 start_killing=False, start_openning:bool=True, width:int=1280, height:int=720):
+                 start_killing=False, start_openning:bool=True, width:int=1280, height:int=720,
+                 mute:bool=True):
         """ Constructor of the class
 
         Args:
@@ -51,6 +52,7 @@ class WebScraping ():
             start_openning (bool, optional): Open chrome window before start. Defaults to True.
             width (int, optional): Width of the window. Defaults to 1280.
             height (int, optional): Height of the window. Defaults to 720.
+            mute (bool, optional): Mute the audio of the window. Defaults to True.
         """
 
         self.basetime = 1
@@ -73,6 +75,7 @@ class WebScraping ():
         self.__start_openning__ = start_openning
         self.__width__ = width
         self.__height__ = height
+        self.__mute__ = mute
         
         self.__web_page__ = None
 
@@ -169,6 +172,9 @@ class WebScraping ():
         # headless mode
         if self.__headless__:
             options.add_argument("--headless")
+            
+        if self.__mute__:
+            options.add_argument("--mute-audio")
 
         # Set proxy without autentication
         if (self.__proxy_server__ and self.__proxy_port__
