@@ -56,7 +56,11 @@ class Bot (WebScraping):
         # Css selectors
         self.selectors = {
             "twitch-logo": 'a[aria-label="Twitch Home"]',
-            "twitch-login-btn": 'button[data-a-target="login-button"]'
+            "twitch-login-btn": 'button[data-a-target="login-button"]',
+            'start-stream-btn': 'button[data-a-target="player-overlay-mature-accept"]',
+            'stream-menu-btn': 'button[aria-label="Settings"]',
+            'stream-quality-btn': 'button[data-a-target="player-settings-menu-item-quality"]',
+            'stream-160p-btn': '[data-a-target="player-settings-menu"] > div:last-child input[name="player-settings-submenu-quality-option"]',
         }
     
     def auto_run (self) -> str:
@@ -126,6 +130,10 @@ class Bot (WebScraping):
             if login_button:
                 error = "cookie error"
         
+        # Set stream options
+        if not error:
+            self.__stream_options__ ()
+        
         # Take screenshot
         if self.take_screenshots:
             self.screenshot ("ss.png")
@@ -137,6 +145,25 @@ class Bot (WebScraping):
             return False
         else:
             return True
+        
+    def __stream_options__ (self):
+        """ Set video options, like accept warnning and quality and
+        """
+        
+        # Accept mature content
+        start_stream_elem = self.get_elems (self.selectors["start-stream-btn"])
+        if start_stream_elem:
+            self.click_js (self.selectors["start-stream-btn"])
+            sleep (5)
+            self.refresh_selenium ()
+            
+        # Set lower wuality
+        self.click_js (self.selectors["stream-menu-btn"])
+        self.refresh_selenium ()
+        self.click_js (self.selectors["stream-quality-btn"])
+        self.refresh_selenium ()
+        self.click_js (self.selectors["stream-160p-btn"])
+        
         
     def __end_bot__ (self, force:bool=False):
         """ Close when time out end
