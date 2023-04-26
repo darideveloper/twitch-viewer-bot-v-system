@@ -15,7 +15,8 @@ class Bot (WebScraping):
     
     def __init__ (self, username:str, cookies:list, stream:str, 
                   proxy_host:str, proxy_port:int, proxy_user:str="", proxy_pass:str="",
-                  headless:bool=False, timeout_stream:int=60) -> bool:
+                  headless:bool=False, timeout_stream:int=60,
+                  width:int=1920, height:int=1080) -> bool:
         """ Contructor of class. Start viwer bot
 
         Args:
@@ -40,6 +41,8 @@ class Bot (WebScraping):
         self.proxy_pass = proxy_pass
         self.headless = headless
         self.timeout_stream = timeout_stream
+        self.width = width
+        self.height = height
         
         # Urls and status
         self.twitch_url = f"https://www.twitch.tv/"
@@ -99,7 +102,8 @@ class Bot (WebScraping):
         # Set page
         super().__init__ (headless=self.headless, time_out=30,
                           proxy_server=self.proxy_host, proxy_port=self.proxy_port, 
-                          proxy_user=self.proxy_user, proxy_pass=self.proxy_pass)
+                          proxy_user=self.proxy_user, proxy_pass=self.proxy_pass,
+                          width=self.width, height=self.height)
 
         proxy_working = self.__load_twitch__ ()    
         

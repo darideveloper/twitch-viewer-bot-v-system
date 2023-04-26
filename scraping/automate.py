@@ -30,7 +30,7 @@ class WebScraping ():
                  proxy_server="", proxy_port="", proxy_user="", proxy_pass="",
                  chrome_folder="", user_agent=False, capabilities=False,
                  download_folder="", extensions=[], incognito=False, experimentals=True,
-                 start_killing=False, start_openning:bool=True):
+                 start_killing=False, start_openning:bool=True, width:int=1280, height:int=720):
         """ Constructor of the class
 
         Args:
@@ -49,6 +49,8 @@ class WebScraping ():
             experimentals (bool, optional): Activate the experimentals options. Defaults to True.
             start_killing (bool, optional): Kill chrome process before start. Defaults to False.
             start_openning (bool, optional): Open chrome window before start. Defaults to True.
+            width (int, optional): Width of the window. Defaults to 1280.
+            height (int, optional): Height of the window. Defaults to 720.
         """
 
         self.basetime = 1
@@ -69,6 +71,8 @@ class WebScraping ():
         self.__incognito__ = incognito
         self.__experimentals__ = experimentals
         self.__start_openning__ = start_openning
+        self.__width__ = width
+        self.__height__ = height
         
         self.__web_page__ = None
 
@@ -159,8 +163,11 @@ class WebScraping ():
                 'excludeSwitches', ['enable-logging', "enable-automation"])
             options.add_experimental_option('useAutomationExtension', False)
 
+        # screen size
+        options.add_argument(f"--window-size={self.__width__},{self.__height__}")
+        
+        # headless mode
         if self.__headless__:
-            options.add_argument("--window-size=1920,1080")
             options.add_argument("--headless")
 
         # Set proxy without autentication
