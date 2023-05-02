@@ -160,8 +160,10 @@ class Bot (WebScraping):
             
         # Set lower wuality
         self.click_js (self.selectors["stream-menu-btn"])
+        sleep (2)
         self.refresh_selenium ()
         self.click_js (self.selectors["stream-quality-btn"])
+        sleep (2)
         self.refresh_selenium ()
         self.click_js (self.selectors["stream-160p-btn"])
         
