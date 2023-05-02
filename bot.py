@@ -54,6 +54,10 @@ class Bot (WebScraping):
         self.twitch_url_stream = f"https://www.twitch.tv/{self.stream}"
         self.status = "running"
         
+        # Paths
+        current_folder = os.path.dirname (__file__)
+        self.log_path = os.path.join (current_folder, ".log")
+        
         # Css selectors
         self.selectors = {
             "twitch-logo": 'a[aria-label="Twitch Home"]',
@@ -136,8 +140,16 @@ class Bot (WebScraping):
             try:
                 self.__stream_options__ ()
             except Exception as e:
+                
+                # Save error in logs
                 error = str (e)
-                print (f"\tError: username {self.username}, stream {self.stream}, details: {error}")
+                with open (self.log_path, "w") as f:
+                    f.write (error) 
+                                    
+                print (f"\tError: username {self.username}, stream {self.stream}, details in logs file")
+                
+                # Try to take screenshot
+                self.screenshot ("error.png")
         
         # Take screenshot
         if self.take_screenshots:
