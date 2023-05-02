@@ -27,6 +27,10 @@ class BotsManager ():
         self.settings = api.get_settings ()
         self.proxies = api.get_proxies ()
         
+        # paths
+        current_folder = os.path.dirname (__file__)
+        self.log_path = os.path.join (current_folder, ".log")
+        
         bots_running = {}
         for stream in self.streams:
             bots_running[stream] = []
@@ -76,13 +80,28 @@ class BotsManager ():
                         headless = False
                     
                     # Create and start bot
-                    bot = Bot (user["name"], user["cookies"], stream,
-                            proxy["host"], proxy["port"], proxy["user"], proxy["password"],
-                            timeout_stream=self.settings["timeout-min"], headless=headless, 
-                            width=self.settings["window-width"], height=self.settings["window-height"],
-                            take_screenshots=self.settings["screenshots"])
-                    started = bot.auto_run ()    
-                    
+                    try:
+                        bot = Bot (user["name"], user["cookies"], stream,
+                                proxy["host"], proxy["port"], proxy["user"], proxy["password"],
+                                timeout_stream=self.settings["timeout-min"], headless=headless, 
+                                width=self.settings["window-width"], height=self.settings["window-height"],
+                                take_screenshots=self.settings["screenshots"])
+                        started = bot.auto_run ()    
+                    except Exception as e:
+                
+                        # Save error in logs
+                        error = str (e)
+                        with open (self.log_path, "w") as f:
+                            f.write (error) 
+                                            
+                        print (f"\tError: username {user['name']}, stream {stream}, details in logs file")
+                        
+                        # Try to take screenshot
+                        try:
+                            self.screenshot ("error.png")
+                        except:
+                            break
+                        
                     # Detect if bot started and get status  
                     status = bot.status
                     if started:
