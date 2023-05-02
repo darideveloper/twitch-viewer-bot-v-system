@@ -40,8 +40,7 @@ class BotsManager ():
             stream_users = self.users.copy ()
             
             # Only 2 users in debug mode
-            if DEBUG:
-                stream_users = stream_users[:2]
+            stream_users = stream_users
             
             print ("")
             print (f"Stream: {stream}\n\tstarting bots...")
@@ -55,6 +54,12 @@ class BotsManager ():
                     break
                 user = random.choice (stream_users)
                 stream_users.remove (user)
+                
+                # Open only specific users in debug mode
+                if DEBUG:
+                    if user["name"] not in ["mc_josesmash"]:
+                        continue
+                    
                 
                 # Valñidate if bot started and catch error
                 started = False
