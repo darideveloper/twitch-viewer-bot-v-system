@@ -133,7 +133,11 @@ class Bot (WebScraping):
         
         # Set stream options
         if not error:
-            self.__stream_options__ ()
+            try:
+                self.__stream_options__ ()
+            except Exception as e:
+                error = str (e)
+                print (f"\tError: username {self.username}, stream {self.stream}, details: {error}")
         
         # Take screenshot
         if self.take_screenshots:
