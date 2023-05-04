@@ -1,5 +1,6 @@
 import os
 import json
+import random
 import datetime
 from dotenv import load_dotenv
 from time import sleep
@@ -13,40 +14,36 @@ DEBUG = os.getenv ("DEBUG") == "true"
 class Bot (WebScraping):
     """ Bot for watch Twitch stream, using cookies to login """
     
-    def __init__ (self, username:str, cookies:list, stream:str, 
-                  proxy_host:str, proxy_port:int, proxy_user:str="", proxy_pass:str="",
+    def __init__ (self, username:str, cookies:list, stream:str, proxies:list,
                   headless:bool=False, timeout_stream:int=60,
-                  width:int=1920, height:int=1080, take_screenshots:bool=False) -> bool:
+                  width:int=1920, height:int=1080, take_screenshots:bool=False,
+                  bots_running:list=[]) -> bool:
         """ Contructor of class. Start viwer bot
 
         Args:
             username (str): name of user to login
             cookies (list): cookies for login, generated with chrome extension "EditThisCookie"
             stream (str): user stream to watch
-            proxy_host (str): proxy host
-            proxy_port (int): proxy port
-            proxy_user (str, optional): proxy user. Defaults to ""
-            proxy_pass (str, optional): proxy password. Defaults to ""
+            proxies (list): list of proxies to use
             headless (bool, optional): use headless mode (hide browser). Defaults to False
             timeout_stream (int, optional): time to wait (in minutes) before close browser. Defaults to 60    
             width (int, optional): width of browser window. Defaults to 1920
             height (int, optional): height of browser window. Defaults to 1080
-            take_screenshots (bool, optional): take screenshots in headless mode. Defaults to False    
+            take_screenshots (bool, optional): take screenshots in headless mode. Defaults to False   
+            bots_running (list, optional): list of bots already running. Defaults to [] 
         """
         
         # Save class variables and start browser
         self.username = username
         self.cookies = cookies
         self.stream = stream
-        self.proxy_host = proxy_host
-        self.proxy_port = proxy_port
-        self.proxy_user = proxy_user
-        self.proxy_pass = proxy_pass
+        self.proxies = proxies
         self.headless = headless
         self.timeout_stream = timeout_stream
         self.width = width
         self.height = height
         self.take_screenshots = take_screenshots
+        self.bots_running = bots_running
         
         # Urls and status
         self.twitch_url = f"https://www.twitch.tv/"
@@ -63,6 +60,26 @@ class Bot (WebScraping):
             'stream-quality-btn': 'button[data-a-target="player-settings-menu-item-quality"]',
             'stream-160p-btn': '[data-a-target="player-settings-menu"] > div:last-child input[name="player-settings-submenu-quality-option"]',
         }
+        
+        # paths
+        current_folder = os.path.dirname (__file__)
+        self.log_path = os.path.join (current_folder, ".log")
+        
+    def __get_random_proxy__ (self) -> dict:
+        """ Get random proxy from list and remove it
+
+        Returns:
+            dict: random proxy
+        """
+        
+        # Validate if there are proxies free
+        if not self.proxies:
+            return False
+        
+        proxy = random.choice (self.proxies)
+        self.proxies.remove (proxy)
+        
+        return proxy
     
     def auto_run (self) -> str:
         """ Auto start browser, watch stream and close browser in background
@@ -71,18 +88,24 @@ class Bot (WebScraping):
             bool: True if browser started, False if not
         """
         
+        print (f"({self.stream} - {self.username}) Starting bot...")
+        
         # Start bot and catch load page error
         started = self.__start_bot__ ()
         if started:
+            
+            print (f"\t({self.stream} - {self.username}) Bot running...")
+            
             # Start thread for close browser in background
             therad_end_browser = Thread (target=self.__end_bot__)
             therad_end_browser.start ()
+            
+            # Save bot in list of bots running
+            self.bots_running.append (self)
         else:
             # Force end bot
             self.__end_bot__ (force=True)
-        
-        return started
-        
+                
     def __load_twitch__ (self) -> bool:
         """ Try to load twitch page and validate if proxy is working
 
@@ -106,46 +129,71 @@ class Bot (WebScraping):
             bool: True if browser started, False if not
         """
         
-        error = ""
+        # Load fot load page and find proxy
+        while True:
         
-        # Set page
-        super().__init__ (headless=self.headless, time_out=30,
-                          proxy_server=self.proxy_host, proxy_port=self.proxy_port, 
-                          proxy_user=self.proxy_user, proxy_pass=self.proxy_pass,
-                          width=self.width, height=self.height)
+            # Get random proxy for current bot
+            proxy = self.__get_random_proxy__ ()
+                        
+            # Set page
+            super().__init__ (headless=self.headless, time_out=30,
+                            proxy_server=proxy["host"], proxy_port=proxy["port"], 
+                            proxy_user=proxy["user"], proxy_pass=proxy["password"],
+                            width=self.width, height=self.height)
 
-        proxy_working = self.__load_twitch__ ()    
+            proxy_working = self.__load_twitch__ ()    
+            
+            if not proxy_working:
+                error = f"\t({self.stream} - {self.username}) proxy error: {proxy['host']}:{proxy['port']} bot:"
+                print (error)
+                
+                # End if there are not proxies
+                if not self.proxies:
+                    print (f"\t({self.stream} - {self.username}) No more proxies available. Bot stopped.")                    
+                    return False
+                
+                # Try again with other proxy
+                continue
+            
+            # End loop if proxy is working
+            break
+            
+        # Load cookies
+        self.set_cookies (self.cookies)
         
-        if not proxy_working:
-            error = "proxy error"    
-            
-        if not error:
-            # Load cookies
-            self.set_cookies (self.cookies)
-            
-            # Open stream
-            self.set_page (self.twitch_url_stream)
-            
-            # Validte session with cookies
-            login_button = self.get_elems (self.selectors["twitch-login-btn"])
-            if login_button:
-                error = "cookie error"
+        # Open stream
+        self.set_page (self.twitch_url_stream)
         
+        # Validte session with cookies
+        login_button = self.get_elems (self.selectors["twitch-login-btn"])
+        if login_button:
+            error = f"\t({self.stream} - {self.username}) cookie error with bot"
+            print (error)
+            return False
+    
         # Set stream options
-        if not error:
+        try:
             self.__stream_options__ ()
+        except Exception as e:
+            
+            # Try to take screenshot
+            try:
+                self.screenshot ("error.png")
+            except:
+                pass
+            
+            # Save error details
+            with open (self.log_path) as file:
+                file.write (f"{self.username}: {e}")
+                
+            error = f"\t({self.stream} - {self.username}) stream options error (but bot will continue)"
+            print (error)
            
         # Take screenshot
         if self.take_screenshots:
             self.screenshot ("ss.png")
             
-        # Catch errors
-        if error:
-            # Update status
-            self.status = error
-            return False
-        else:
-            return True
+        return True
         
     def __stream_options__ (self):
         """ Set video options, like accept warnning and quality and
@@ -184,7 +232,7 @@ class Bot (WebScraping):
             if timeout_seconds > 0:
                 sleep (timeout_seconds)
             self.status = "ended"    
-            print (f"\tBot ended: {self.username}")
+            print (f"({self.stream} - {self.username}) Bot ended.")
                 
         self.driver.quit ()
 

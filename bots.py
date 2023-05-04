@@ -1,17 +1,25 @@
 import os
 import random
+from time import sleep
+from concurrent.futures import ThreadPoolExecutor
+
 from api import Api
 from bot import Bot
+
 from dotenv import load_dotenv
 
 load_dotenv ()
 
 DEBUG = os.getenv ("DEBUG") == "true"
+DEBUG_USERS = os.getenv ("DEBUG_USERS")
+if DEBUG_USERS and DEBUG_USERS != "":
+    DEBUG_USERS = DEBUG_USERS.split (",")
 
 class BotsManager ():
     """ Watch Twitch stream with a multiple users, using cookies to login """
     
     def __init__ (self):     
+        
         
         # Connect to api
         api = Api ()
@@ -27,9 +35,11 @@ class BotsManager ():
         self.settings = api.get_settings ()
         self.proxies = api.get_proxies ()
         
-        # paths
-        current_folder = os.path.dirname (__file__)
-        self.log_path = os.path.join (current_folder, ".log")
+        # Separator
+        print ()
+        
+        # Create threads executor
+        executor = ThreadPoolExecutor(max_workers=self.settings["threads"])
         
         bots_running = {}
         for stream in self.streams:
@@ -45,103 +55,46 @@ class BotsManager ():
             
             # Only 2 users in debug mode
             stream_users = stream_users
-            
-            print ("")
-            print (f"Stream: {stream}\n\tstarting bots...")
-            
+                        
             # Generate specific number of bots, from settings
             while len(bots_running[stream]) < self.settings["viwers-stream"]:
                                 
                 # Get random user
                 if not stream_users:
-                    print (f"\tNo more users available for this stream.")
                     break
                 user = random.choice (stream_users)
                 stream_users.remove (user)
                 
-                # Open only specific users in debug mode
+                # Debug options
+                headless = self.settings["headless"]
                 if DEBUG:
-                    if user["name"] not in ["mc_josesmash"]:
+                    
+                    # Force headless mode
+                    headless = False
+                
+                    # Only start debug users
+                    if DEBUG_USERS and user["name"] not in DEBUG_USERS:
                         continue
-                    
                 
-                # Valñidate if bot started and catch error
-                started = False
-                while not started:
-                                        
-                    # Get random proxy and catch
-                    proxy = self.__get_random_proxy__ ()
-                    if not self.proxies:
-                        print (f"\tNo more proxies available. Bot: {user['name']} stopped.")
-                        break
-                    
-                    headless = self.settings["headless"]
-                    if DEBUG:
-                        headless = False
-                    
-                    # Create and start bot
-                    try:
-                        bot = Bot (user["name"], user["cookies"], stream,
-                                proxy["host"], proxy["port"], proxy["user"], proxy["password"],
-                                timeout_stream=self.settings["timeout-min"], headless=headless, 
-                                width=self.settings["window-width"], height=self.settings["window-height"],
-                                take_screenshots=self.settings["screenshots"])
-                        started = bot.auto_run ()    
-                    except Exception as e:
+                bot = Bot (user["name"], user["cookies"], stream, self.proxies,
+                        timeout_stream=self.settings["timeout-min"], headless=headless, 
+                        width=self.settings["window-width"], height=self.settings["window-height"],
+                        take_screenshots=self.settings["screenshots"], bots_running=bots_running[stream])
                 
-                        # Save error in logs
-                        error = str (e)
-                        with open (self.log_path, "w") as f:
-                            f.write (error) 
-                                            
-                        print (f"\tError: username {user['name']}, stream {stream}, details in logs file")
-                        
-                        # Try to take screenshot
-                        try:
-                            self.screenshot ("error.png")
-                        except:
-                            break
-                        
-                    # Detect if bot started and get status  
-                    status = bot.status
-                    if started:
-                        break
-                    
-                    # Catch proxy error
-                    if status == "proxy error":
-                        print (f"\tBot error with proxy: {proxy['host']}:{proxy['port']}:{proxy['user']}:{proxy['password']}. Retrying...")
-                        
-                    if status == "cookie error":
-                        print (f"\tBot error with user: {user['name']}. Update the cookies.")
-                        break
-                        
-                if started:
-                    print (f"\tBot: {bot.username} running...")
-                    
-                    # Save bot instance
-                    bots_running[stream].append (bot) 
-        
-        if bots_running:
-            print (f'\nBots running: ')
-            for stream, bots in bots_running.items():
-                print (f"\t{stream}: {len(bots)}")    
-        print ()
-            
-    def __get_random_proxy__ (self) -> dict:
-        """ Get random proxy from list and remove it
+                executor.submit (self.__auto_run_bot__, bot) 
+    
+    def __auto_run_bot__ (self, bot:Bot):
+        """ Run single bot instance, with threading
 
-        Returns:
-            dict: random proxy
+        Args:
+            bot (Bot): bot instance
         """
         
-        # Validate if there are proxies free
-        if not self.proxies:
-            return False
+        # Random delay to start
+        delay = random.randint (1, 30)
+        sleep (delay/10)
         
-        proxy = random.choice (self.proxies)
-        self.proxies.remove (proxy)
-        
-        return proxy
+        bot.auto_run ()
         
 if __name__ == "__main__":
     # Test class
