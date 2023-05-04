@@ -14,6 +14,7 @@ DEBUG = os.getenv ("DEBUG") == "true"
 DEBUG_USERS = os.getenv ("DEBUG_USERS")
 if DEBUG_USERS and DEBUG_USERS != "":
     DEBUG_USERS = DEBUG_USERS.split (",")
+DIABLE_THREADS = os.getenv ("DIABLE_THREADS") == "true"
 
 class BotsManager ():
     """ Watch Twitch stream with a multiple users, using cookies to login """
@@ -91,8 +92,10 @@ class BotsManager ():
                     
                 else:
                     # Start bot in a thread if no error
-                    executor.submit (self.__auto_run_bot__, bot) 
-                    # bot.auto_run ()
+                    if DIABLE_THREADS:
+                        bot.auto_run ()
+                    else:
+                        executor.submit (self.__auto_run_bot__, bot) 
     
     def __auto_run_bot__ (self, bot:Bot):
         """ Run single bot instance, with threading
