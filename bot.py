@@ -99,14 +99,15 @@ class Bot (WebScraping):
         started = self.__start_bot__ ()
         if started:
             
-            print (f"\t({self.stream} - {self.username}) Bot running")
+            # Save bot in list of bots running
+            self.bots_running.append (self)
+            
+            print (f"\t({self.stream} - {self.username}) Bot running (total bots in stream: {len (self.bots_running)})")
             
             # Start thread for close browser in background
             therad_end_browser = Thread (target=self.__end_bot__)
             therad_end_browser.start ()
             
-            # Save bot in list of bots running
-            self.bots_running.append (self)
         else:
             # Force end bot
             self.__end_bot__ (force=True)
