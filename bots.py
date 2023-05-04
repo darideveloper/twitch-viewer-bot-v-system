@@ -76,12 +76,23 @@ class BotsManager ():
                     if DEBUG_USERS and user["name"] not in DEBUG_USERS:
                         continue
                 
-                bot = Bot (user["name"], user["cookies"], stream, self.proxies,
-                        timeout_stream=self.settings["timeout-min"], headless=headless, 
-                        width=self.settings["window-width"], height=self.settings["window-height"],
-                        take_screenshots=self.settings["screenshots"], bots_running=bots_running[stream])
-                
-                executor.submit (self.__auto_run_bot__, bot) 
+                try:
+                    bot = Bot (user["name"], user["cookies"], stream, self.proxies,
+                            timeout_stream=self.settings["timeout-min"], headless=headless, 
+                            width=self.settings["window-width"], height=self.settings["window-height"],
+                            take_screenshots=self.settings["screenshots"], bots_running=bots_running[stream])
+                except Exception as e:
+                    error = f"\t({self.stream} - {self.username}) error creating bot"
+                    print (error)
+                    
+                    # Save error details
+                    with open (self.log_path, "a", encoding='UTF-8') as file:
+                        file.write (f"{self.stream} - {self.username}: {str(e)}\n")
+                    
+                else:
+                    # Start bot in a thread if no error
+                    executor.submit (self.__auto_run_bot__, bot) 
+                    # bot.auto_run ()
     
     def __auto_run_bot__ (self, bot:Bot):
         """ Run single bot instance, with threading

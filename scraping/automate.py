@@ -18,8 +18,7 @@ logger_webdriver = logging.getLogger("webdriver_manager")
 logger_webdriver.setLevel(logging.ERROR)
 
 logger_selenium = logging.getLogger("selenium")
-logger_selenium.setLevel(logging.ERROR)
-
+logger_selenium.disabled = True
 
 class WebScraping ():
     """

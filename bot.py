@@ -64,6 +64,11 @@ class Bot (WebScraping):
         # paths
         current_folder = os.path.dirname (__file__)
         self.log_path = os.path.join (current_folder, ".log")
+        self.screenshots_folder = os.path.join (current_folder, "screenshots")
+        self.screenshots_errors_folder = os.path.join (self.screenshots_folder, "errors")
+        
+        # Create folders
+        os.makedirs (self.screenshots_errors_folder, exist_ok=True)
         
     def __get_random_proxy__ (self) -> dict:
         """ Get random proxy from list and remove it
@@ -94,7 +99,7 @@ class Bot (WebScraping):
         started = self.__start_bot__ ()
         if started:
             
-            print (f"\t({self.stream} - {self.username}) Bot running...")
+            print (f"\t({self.stream} - {self.username}) Bot running")
             
             # Start thread for close browser in background
             therad_end_browser = Thread (target=self.__end_bot__)
@@ -144,12 +149,12 @@ class Bot (WebScraping):
             proxy_working = self.__load_twitch__ ()    
             
             if not proxy_working:
-                error = f"\t({self.stream} - {self.username}) proxy error: {proxy['host']}:{proxy['port']} bot:"
+                error = f"\t({self.stream} - {self.username}) proxy error: {proxy['host']}:{proxy['port']}. Retrying..."
                 print (error)
                 
                 # End if there are not proxies
                 if not self.proxies:
-                    print (f"\t({self.stream} - {self.username}) No more proxies available. Bot stopped.")                    
+                    print (f"\t({self.stream} - {self.username}) No more proxies available")                    
                     return False
                 
                 # Try again with other proxy
@@ -162,12 +167,16 @@ class Bot (WebScraping):
         self.set_cookies (self.cookies)
         
         # Open stream
-        self.set_page (self.twitch_url_stream)
+        try:
+            self.set_page (self.twitch_url_stream)
+        except Exception as e:
+            error = f"\t({self.stream} - {self.username}) proxy error: {proxy['host']}:{proxy['port']} bot"
+            return False
         
         # Validte session with cookies
         login_button = self.get_elems (self.selectors["twitch-login-btn"])
         if login_button:
-            error = f"\t({self.stream} - {self.username}) cookie error with bot"
+            error = f"\t({self.stream} - {self.username}) cookie error"
             print (error)
             return False
     
@@ -176,29 +185,32 @@ class Bot (WebScraping):
             self.__stream_options__ ()
         except Exception as e:
             
-            # Try to take screenshot
-            try:
-                self.screenshot ("error.png")
-            except:
-                pass
-            
             # Save error details
-            with open (self.log_path) as file:
-                file.write (f"{self.username}: {e}")
+            with open (self.log_path, "a", encoding='UTF-8') as file:
+                file.write (f"{self.stream} - {self.username}: {str(e)}\n")
                 
             error = f"\t({self.stream} - {self.username}) stream options error (but bot will continue)"
             print (error)
+            
+            # Try to take screenshot
+            try:
+                screenshot_path = os.path.join(self.screenshots_folder, "errors", f"{self.stream} - {self.username}.png")
+                self.screenshot (screenshot_path)
+            except:
+                print (f"\t({self.stream} - {self.username}) error taking screenshot")
+            
            
         # Take screenshot
         if self.take_screenshots:
-            self.screenshot ("ss.png")
+            screenshot_path = os.path.join(self.screenshots_folder, f"{self.stream} - {self.username}.png")
+            self.screenshot (screenshot_path)
             
         return True
         
     def __stream_options__ (self):
         """ Set video options, like accept warnning and quality and
         """
-        
+                
         # Accept mature content
         start_stream_elem = self.get_elems (self.selectors["start-stream-btn"])
         if start_stream_elem:
@@ -214,7 +226,6 @@ class Bot (WebScraping):
         sleep (2)
         self.refresh_selenium ()
         self.click_js (self.selectors["stream-160p-btn"])
-        
         
     def __end_bot__ (self, force:bool=False):
         """ Close when time out end
@@ -232,7 +243,12 @@ class Bot (WebScraping):
             if timeout_seconds > 0:
                 sleep (timeout_seconds)
             self.status = "ended"    
-            print (f"({self.stream} - {self.username}) Bot ended.")
+            
+            # Random delay to start
+            delay = random.randint (1, 30)
+            sleep (delay/10)
+        
+            print (f"({self.stream} - {self.username}) Bot ended")
                 
         self.driver.quit ()
 
