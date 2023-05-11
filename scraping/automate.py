@@ -131,7 +131,7 @@ class WebScraping ():
                 del cookie["id"]
 
             # Fix domain
-            if cookie["domain"].startswith("."):
+            if cookie.get("domain") and cookie["domain"].startswith("."):
                 cookie["domain"] = cookie["domain"][1:]
 
             cookies_formatted.append(cookie)

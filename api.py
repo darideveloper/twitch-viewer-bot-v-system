@@ -167,3 +167,17 @@ class Api ():
         # Get data from api
         res = self.__requests_url__("donations")
         return res.json()
+    
+    def disable_user (self, username:str): 
+        """ Disable user in the API
+
+        Args:
+            username (str): user name to disable
+        """
+        
+        res = self.__requests_url__("disable-user/" + username)
+        print (f"\t{username}: {res.text}")
+        
+if __name__ == "__main__":
+    api = Api()
+    api.disable_user("vegetta_pelon")

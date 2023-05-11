@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from time import sleep
 from threading import Thread
 from scraping.automate import WebScraping
+from api import Api
 
 load_dotenv ()
 
@@ -69,6 +70,9 @@ class Bot (WebScraping):
         
         # Create folders
         os.makedirs (self.screenshots_errors_folder, exist_ok=True)
+        
+        # Api connection
+        self.api = Api ()
         
     def __get_random_proxy__ (self) -> dict:
         """ Get random proxy from list and remove it
@@ -179,6 +183,10 @@ class Bot (WebScraping):
         if login_button:
             error = f"\t({self.stream} - {self.username}) cookie error"
             print (error)
+            
+            # Disable user in backend
+            self.api.disable_user (self.username)
+            
             return False
     
         # Set stream options
