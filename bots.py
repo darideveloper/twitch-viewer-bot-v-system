@@ -35,6 +35,7 @@ class BotsManager ():
         self.users = api.get_users ()
         self.settings = api.get_settings ()
         self.proxies = api.get_proxies ()
+        self.donations = api.get_donations ()
         
         # Separator
         print ()
@@ -53,9 +54,6 @@ class BotsManager ():
                 continue
             
             stream_users = self.users.copy ()
-            
-            # Only 2 users in debug mode
-            stream_users = stream_users
                         
             # Generate specific number of bots, from settings
             while len(bots_running[stream]) < self.settings["viwers-stream"]:
@@ -78,7 +76,7 @@ class BotsManager ():
                         continue
                 
                 try:
-                    bot = Bot (user["name"], user["cookies"], stream, self.proxies,
+                    bot = Bot (user["name"], user["cookies"], stream, self.proxies, self.donations,
                             timeout_stream=self.settings["timeout-min"], headless=headless, 
                             width=self.settings["window-width"], height=self.settings["window-height"],
                             take_screenshots=self.settings["screenshots"], bots_running=bots_running[stream])

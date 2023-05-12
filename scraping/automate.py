@@ -184,13 +184,14 @@ class WebScraping ():
             options.add_argument(f"--proxy-server={proxy}")
 
         # Set proxy with autentification
-        # seleniumwire_options = {}
         if (self.__proxy_server__ and self.__proxy_port__
                 and self.__proxy_user__ and self.__proxy_pass__):
             
             self.__create_proxy_extesion__()
             options.add_extension(self.__pluginfile__)
 
+        # DEBUG
+        # options.add_argument(f"--user-data-dir=C:\\Users\\daria\\AppData\\Local\\Google\\Chrome\\User Data")
         # Set chrome folder
         if self.__chrome_folder__:
             options.add_argument(f"--user-data-dir={self.__chrome_folder__}")
