@@ -3,11 +3,10 @@ import json
 import time
 import logging
 import zipfile
-from seleniumwire import webdriver
+from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
-from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from webdriver_manager.chrome import ChromeDriverManager, ChromeType
 
@@ -172,7 +171,7 @@ class WebScraping ():
         
         # headless mode
         if self.__headless__:
-            options.add_argument("--headless")
+            options.add_argument("--headless=new")
             
         if self.__mute__:
             options.add_argument("--mute-audio")
@@ -185,17 +184,12 @@ class WebScraping ():
             options.add_argument(f"--proxy-server={proxy}")
 
         # Set proxy with autentification
-        seleniumwire_options = {}
+        # seleniumwire_options = {}
         if (self.__proxy_server__ and self.__proxy_port__
                 and self.__proxy_user__ and self.__proxy_pass__):
             
-            seleniumwire_options = {
-                'proxy': {
-                    'http': f'http://{self.__proxy_user__}:{self.__proxy_pass__}@{self.__proxy_server__}:{self.__proxy_port__}',
-                    'verify_ssl': True,
-                },
-            }
-                    
+            self.__create_proxy_extesion__()
+            options.add_extension(self.__pluginfile__)
 
         # Set chrome folder
         if self.__chrome_folder__:
@@ -242,8 +236,8 @@ class WebScraping ():
         self.driver = webdriver.Chrome(chromedriver,
                                        options=options,
                                        service_log_path=None,
-                                       desired_capabilities=capabilities,
-                                       seleniumwire_options=seleniumwire_options)
+                                       desired_capabilities=capabilities)#,
+                                    #    seleniumwire_options=seleniumwire_options)
 
     def __create_proxy_extesion__(self):
         """Create a proxy chrome extension"""
@@ -538,7 +532,7 @@ class WebScraping ():
             self.driver.get(self.__web_page__)
 
         # Catch error in load page
-        except TimeoutException:
+        except Exception as err:
 
             # Raise error
             if break_time_out:
