@@ -52,6 +52,7 @@ class Bot (WebScraping):
         self.twitch_url = f"https://www.twitch.tv/"
         self.twitch_url_login = f"https://www.twitch.tv/login/"
         self.twitch_url_stream = f"https://www.twitch.tv/{self.stream}"
+        self.twitch_url_chat = f"https://www.twitch.tv/popout/{self.stream}/chat?popout="
         self.status = "running"
         
         # Css selectors
@@ -64,6 +65,9 @@ class Bot (WebScraping):
             'stream-160p-btn': '[data-a-target="player-settings-menu"] > div:last-child input[name="player-settings-submenu-quality-option"]',
             'comment_textarea': '[role="textbox"]',
             'comment_send_btn': 'button[data-a-target="chat-send-button"]',
+            'comment_accept_btn': 'button[data-test-selector="chat-rules-ok-button"]',
+            "offline_status": '.home .channel-status-info.channel-status-info--offline'
+            
         }
         
         # paths
@@ -182,6 +186,7 @@ class Bot (WebScraping):
             error = f"\t({self.stream} - {self.username}) proxy error: {proxy['host']}:{proxy['port']} bot"
             return False
         
+        
         # Validte session with cookies
         login_button = self.get_elems (self.selectors["twitch-login-btn"])
         if login_button:
@@ -193,11 +198,13 @@ class Bot (WebScraping):
             
             return False
         
-        # Validate if a donation match with current bot and stream
-        donation = list(filter (lambda donation: donation["streamer"] == self.stream and donation["user"] == self.username, self.donations))
-        if donation:
-            donation = donation[0]
-            self.__send_donation__ (donation["amount"], donation["message"])
+        # Check if stream is offline
+        offline_status = self.get_elems (self.selectors["offline_status"])
+        if offline_status:
+            error = f"\t({self.stream} - {self.username}) stream offline"
+            print (error)
+            
+            return False
     
         # Set stream options
         try:
@@ -218,6 +225,14 @@ class Bot (WebScraping):
             except:
                 print (f"\t({self.stream} - {self.username}) error taking screenshot")
             
+        # Open chat in new window
+        self.__chat_new_window__ ()
+        
+        # Validate if a donation match with current bot and stream
+        donation = list(filter (lambda donation: donation["streamer"] == self.stream and donation["user"] == self.username, self.donations))
+        if donation:
+            donation = donation[0]
+            self.__send_donation__ (donation["amount"], donation["message"])
            
         # Take screenshot
         if self.take_screenshots:
@@ -225,6 +240,14 @@ class Bot (WebScraping):
             self.screenshot (screenshot_path)
             
         return True
+    
+    def __chat_new_window__ (self):
+        """ Open chat in new window
+        """
+                
+        self.open_tab ()
+        self.switch_to_tab (1)
+        self.set_page (self.twitch_url_chat)
         
     def __stream_options__ (self):
         """ Set video options, like accept warnning and quality and
@@ -264,9 +287,26 @@ class Bot (WebScraping):
         comment_send_btn = self.get_elems (self.selectors["comment_send_btn"])
         if not comment_textarea or not comment_send_btn:
             raise Exception ("Controls not visible")
-                
+        
+        # Write message
+        sleep (3)
+        self.refresh_selenium (back_tab=1)
         self.send_data (self.selectors["comment_textarea"], message)
-        sleep (2)
+        
+        # Accept chat rules
+        sleep (1)
+        self.refresh_selenium (back_tab=1)
+        comment_accept_elem = self.get_elems (self.selectors["comment_accept_btn"])
+        if comment_accept_elem:
+            self.click_js (self.selectors["comment_accept_btn"])
+            sleep (1)
+            self.refresh_selenium (back_tab=1)
+        
+        
+            # Write and submit message
+            self.send_data (self.selectors["comment_textarea"], message)
+            sleep (2)
+            
         self.click_js (self.selectors["comment_send_btn"])
         
         
