@@ -224,9 +224,6 @@ class Bot (WebScraping):
                 self.screenshot (screenshot_path)
             except:
                 print (f"\t({self.stream} - {self.username}) error taking screenshot")
-            
-        # Open chat in new window
-        self.__chat_new_window__ ()
         
         # Validate if a donation match with current bot and stream
         donation = list(filter (lambda donation: donation["streamer"] == self.stream and donation["user"] == self.username, self.donations))
@@ -240,15 +237,7 @@ class Bot (WebScraping):
             self.screenshot (screenshot_path)
             
         return True
-    
-    def __chat_new_window__ (self):
-        """ Open chat in new window
-        """
-                
-        self.open_tab ()
-        self.switch_to_tab (1)
-        self.set_page (self.twitch_url_chat)
-        
+
     def __stream_options__ (self):
         """ Set video options, like accept warnning and quality and
         """
@@ -290,17 +279,17 @@ class Bot (WebScraping):
         
         # Write message
         sleep (3)
-        self.refresh_selenium (back_tab=1)
+        self.refresh_selenium ()
         self.send_data (self.selectors["comment_textarea"], message)
         
         # Accept chat rules
         sleep (1)
-        self.refresh_selenium (back_tab=1)
+        self.refresh_selenium ()
         comment_accept_elem = self.get_elems (self.selectors["comment_accept_btn"])
         if comment_accept_elem:
             self.click_js (self.selectors["comment_accept_btn"])
             sleep (1)
-            self.refresh_selenium (back_tab=1)
+            self.refresh_selenium ()
         
         
             # Write and submit message
