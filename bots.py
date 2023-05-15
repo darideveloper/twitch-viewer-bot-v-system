@@ -55,13 +55,19 @@ class BotsManager ():
             stream_users = self.users.copy ()
                         
             # Generate specific number of bots, from settings
-            while len(bots_running[stream]) < self.settings["viwers-stream"]:
+            for _ in range(self.settings["viwers-stream"]):
                                 
+                # Default user
+                user = {
+                    "name": "no-user",
+                    "cookies": [],
+                    "is_active": True
+                }
+                
                 # Get random user
-                if not stream_users:
-                    break
-                user = random.choice (stream_users)
-                stream_users.remove (user)
+                if stream_users:
+                    user = random.choice (stream_users)
+                    stream_users.remove (user)
                 
                 # Debug options
                 headless = self.settings["headless"]

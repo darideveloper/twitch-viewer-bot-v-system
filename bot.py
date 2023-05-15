@@ -197,6 +197,7 @@ class Bot (WebScraping):
             return False
         
         # Check if stream is offline
+        self.refresh_selenium ()
         offline_status = self.get_elems (self.selectors["offline_status"])
         if offline_status:
             error = f"\t({self.stream} - {self.username}) stream offline"
