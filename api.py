@@ -141,32 +141,6 @@ class Api ():
         # Get data from api
         res = self.__requests_url__("streams")
         return res.json()
-
-    def get_donations(self) -> dict:
-        """ Get donations of the current live streams in comunidad mc, using the API
-
-        Returns:
-            dict: donations data.
-
-            Example:
-            [
-                {
-                    "user": "SoyUnFarsantee",
-                    "streamer": "pipevillanu3va",
-                    "minute": 10,
-                    "amount": 1,
-                    "message": "eres un pro",
-                    "status": false
-                }
-                ...
-            ]
-        """
-
-        print("getting donations...")
-
-        # Get data from api
-        res = self.__requests_url__("donations")
-        return res.json()
     
     def disable_user (self, username:str): 
         """ Disable user in the API

@@ -16,7 +16,7 @@ class Bot (WebScraping):
     """ Bot for watch Twitch stream, using cookies to login """
     
     def __init__ (self, username:str, cookies:list, stream:str, proxies:list,
-                  donations:list, headless:bool=False, timeout_stream:int=60,
+                  headless:bool=False, timeout_stream:int=60,
                   width:int=1920, height:int=1080, take_screenshots:bool=False,
                   bots_running:list=[]) -> bool:
         """ Contructor of class. Start viwer bot
@@ -26,7 +26,6 @@ class Bot (WebScraping):
             cookies (list): cookies for login, generated with chrome extension "EditThisCookie"
             stream (str): user stream to watch
             proxies (list): list of proxies to use
-            donations (list): list of donations to send
             headless (bool, optional): use headless mode (hide browser). Defaults to False
             timeout_stream (int, optional): time to wait (in minutes) before close browser. Defaults to 60    
             width (int, optional): width of browser window. Defaults to 1920
@@ -40,7 +39,6 @@ class Bot (WebScraping):
         self.cookies = cookies
         self.stream = stream
         self.proxies = proxies
-        self.donations = donations
         self.headless = headless
         self.timeout_stream = timeout_stream
         self.width = width
@@ -224,12 +222,6 @@ class Bot (WebScraping):
                 self.screenshot (screenshot_path)
             except:
                 print (f"\t({self.stream} - {self.username}) error taking screenshot")
-        
-        # Validate if a donation match with current bot and stream
-        donation = list(filter (lambda donation: donation["streamer"] == self.stream and donation["user"] == self.username, self.donations))
-        if donation:
-            donation = donation[0]
-            self.__send_donation__ (donation["amount"], donation["message"])
            
         # Take screenshot
         if self.take_screenshots:
@@ -257,17 +249,6 @@ class Bot (WebScraping):
         sleep (2)
         self.refresh_selenium ()
         self.click_js (self.selectors["stream-160p-btn"])
-        
-    def __send_donation__ (self, amount:int, message:str):
-        """ Donate to current streamer
-
-        Args:
-            amount (int): bits to donate
-            message (str): donation message
-        """
-        
-        donation = f"cheer{amount} {message}"
-        self.__send_message__ (donation)    
         
     def __send_message__ (self, message):
         
