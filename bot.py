@@ -175,7 +175,8 @@ class Bot (WebScraping):
             break
             
         # Load cookies
-        self.set_cookies (self.cookies)
+        if self.username != "no-user":
+            self.set_cookies (self.cookies)
         
         # Open stream
         try:
@@ -187,7 +188,7 @@ class Bot (WebScraping):
         
         # Validte session with cookies
         login_button = self.get_elems (self.selectors["twitch-login-btn"])
-        if login_button:
+        if login_button and self.username != "no-user":
             error = f"\t({self.stream} - {self.username}) cookie error"
             print (error)
             
