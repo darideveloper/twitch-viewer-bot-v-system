@@ -1,9 +1,8 @@
 import os
-import json
 import time
 import logging
 import zipfile
-from selenium import webdriver
+from seleniumwire import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
@@ -187,8 +186,12 @@ class WebScraping ():
         if (self.__proxy_server__ and self.__proxy_port__
                 and self.__proxy_user__ and self.__proxy_pass__):
             
-            self.__create_proxy_extesion__()
-            options.add_extension(self.__pluginfile__)
+            seleniumwire_options = {
+                'proxy': {
+                    'http': f'http://{self.__proxy_user__}:{self.__proxy_pass__}@{self.__proxy_server__}:{self.__proxy_port__}',
+                    'verify_ssl': True,
+                },
+            }
 
         # Set chrome folder
         if self.__chrome_folder__:
@@ -235,7 +238,8 @@ class WebScraping ():
         self.driver = webdriver.Chrome(chromedriver,
                                        options=options,
                                        service_log_path=None,
-                                       desired_capabilities=capabilities)
+                                       desired_capabilities=capabilities,
+                                       seleniumwire_options=seleniumwire_options)
 
     def __create_proxy_extesion__(self):
         """Create a proxy chrome extension"""
