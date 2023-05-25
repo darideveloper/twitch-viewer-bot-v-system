@@ -153,8 +153,8 @@ class Bot (WebScraping):
                         
             # Set page
             super().__init__ (headless=self.headless, time_out=30,
-                            # proxy_server=proxy["host"], proxy_port=proxy["port"], 
-                            # proxy_user=proxy["user"], proxy_pass=proxy["password"],
+                            proxy_server=proxy["host"], proxy_port=proxy["port"], 
+                            proxy_user=proxy["user"], proxy_pass=proxy["password"],
                             width=self.width, height=self.height)
 
             proxy_working = self.__load_twitch__ ()    

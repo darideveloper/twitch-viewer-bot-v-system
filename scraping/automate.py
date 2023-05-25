@@ -176,19 +176,19 @@ class WebScraping ():
         if self.__mute__:
             options.add_argument("--mute-audio")
 
-        # # Set proxy without autentication
-        # if (self.__proxy_server__ and self.__proxy_port__
-        #         and not self.__proxy_user__ and not self.__proxy_pass__):
+        # Set proxy without autentication
+        if (self.__proxy_server__ and self.__proxy_port__
+                and not self.__proxy_user__ and not self.__proxy_pass__):
 
-        #     proxy = f"{self.__proxy_server__}:{self.__proxy_port__}"
-        #     options.add_argument(f"--proxy-server={proxy}")
+            proxy = f"{self.__proxy_server__}:{self.__proxy_port__}"
+            options.add_argument(f"--proxy-server={proxy}")
 
-        # # Set proxy with autentification
-        # if (self.__proxy_server__ and self.__proxy_port__
-        #         and self.__proxy_user__ and self.__proxy_pass__):
+        # Set proxy with autentification
+        if (self.__proxy_server__ and self.__proxy_port__
+                and self.__proxy_user__ and self.__proxy_pass__):
             
-        #     self.__create_proxy_extesion__()
-        #     options.add_extension(self.__pluginfile__)
+            self.__create_proxy_extesion__()
+            options.add_extension(self.__pluginfile__)
 
         # Set chrome folder
         if self.__chrome_folder__:
