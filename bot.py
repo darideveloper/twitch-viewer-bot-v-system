@@ -114,13 +114,9 @@ class Bot (WebScraping):
             
             print (f"\t({self.stream} - {self.username}) Bot running (total bots in stream: {len (self.bots_running)})")
             
-            # Start thread for close browser in background
-            therad_end_browser = Thread (target=self.__end_bot__)
-            therad_end_browser.start ()
-            
         else:
             # Force end bot
-            self.__end_bot__ (force=True)
+            self.driver.quit ()
                 
     def __load_twitch__ (self) -> bool:
         """ Try to load twitch page and validate if proxy is working
@@ -279,33 +275,7 @@ class Bot (WebScraping):
             self.send_data (self.selectors["comment_textarea"], message)
             sleep (2)
             
-        self.click_js (self.selectors["comment_send_btn"])
-        
-        
-    def __end_bot__ (self, force:bool=False):
-        """ Close when time out end
-
-        Args:
-            force (bool, optional): force close browser. Defaults to False
-        """
-        
-        if not force:
-            
-            # Calculate and sleep fime running
-            now = datetime.datetime.now ()
-            timeout = self.timeout_stream - now.minute
-            timeout_seconds = timeout * 60
-            if timeout_seconds > 0:
-                sleep (timeout_seconds)
-            self.status = "ended"    
-            
-            # Random delay to start
-            delay = random.randint (1, 30)
-            sleep (delay/10)
-        
-            print (f"({self.stream} - {self.username}) Bot ended")
-                
-        self.driver.quit ()
+        self.click_js (self.selectors["comment_send_btn"])       
 
         
 if __name__ == "__main__":
