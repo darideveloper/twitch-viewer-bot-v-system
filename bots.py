@@ -82,8 +82,7 @@ class BotsManager ():
                 
                 try:
                     bot = Bot (user["name"], user["cookies"], stream, self.proxies,
-                            timeout_stream=self.settings["timeout-min"], headless=headless, 
-                            width=self.settings["window-width"], height=self.settings["window-height"],
+                            headless=headless, width=self.settings["window-width"], height=self.settings["window-height"],
                             take_screenshots=self.settings["screenshots"], bots_running=bots_running[stream])
                 except Exception as e:
                     error = f"\t({self.stream} - {self.username}) error creating bot"

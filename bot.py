@@ -16,8 +16,7 @@ class Bot (WebScraping):
     """ Bot for watch Twitch stream, using cookies to login """
     
     def __init__ (self, username:str, cookies:list, stream:str, proxies:list,
-                  headless:bool=False, timeout_stream:int=60,
-                  width:int=1920, height:int=1080, take_screenshots:bool=False,
+                  headless:bool=False, width:int=1920, height:int=1080, take_screenshots:bool=False,
                   bots_running:list=[]) -> bool:
         """ Contructor of class. Start viwer bot
 
@@ -27,7 +26,6 @@ class Bot (WebScraping):
             stream (str): user stream to watch
             proxies (list): list of proxies to use
             headless (bool, optional): use headless mode (hide browser). Defaults to False
-            timeout_stream (int, optional): time to wait (in minutes) before close browser. Defaults to 60    
             width (int, optional): width of browser window. Defaults to 1920
             height (int, optional): height of browser window. Defaults to 1080
             take_screenshots (bool, optional): take screenshots in headless mode. Defaults to False   
@@ -40,7 +38,6 @@ class Bot (WebScraping):
         self.stream = stream
         self.proxies = proxies
         self.headless = headless
-        self.timeout_stream = timeout_stream
         self.width = width
         self.height = height
         self.take_screenshots = take_screenshots
