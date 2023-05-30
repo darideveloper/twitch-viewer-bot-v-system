@@ -114,6 +114,10 @@ class Bot (WebScraping):
             
             print (f"\t({self.stream} - {self.username}) Bot running (total bots in stream: {len (self.bots_running)})")
             
+            # Infinity loop to watch stream
+            while True:
+                sleep (60)
+            
         else:
             # Force end bot
             self.driver.quit ()
