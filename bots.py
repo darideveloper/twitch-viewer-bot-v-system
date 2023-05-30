@@ -100,6 +100,7 @@ class BotsManager ():
                         executor.submit (self.__auto_run_bot__, bot) 
                         
         # Infinity loop to watch stream
+        print ("Bot running...")
         while True:
             sleep (60)
     
