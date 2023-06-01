@@ -186,12 +186,8 @@ class WebScraping ():
         if (self.__proxy_server__ and self.__proxy_port__
                 and self.__proxy_user__ and self.__proxy_pass__):
             
-            seleniumwire_options = {
-                'proxy': {
-                    'http': f'http://{self.__proxy_user__}:{self.__proxy_pass__}@{self.__proxy_server__}:{self.__proxy_port__}',
-                    'verify_ssl': True,
-                },
-            }
+            self.__create_proxy_extesion__()
+            options.add_extension(self.__pluginfile__)
 
         # Set chrome folder
         if self.__chrome_folder__:
