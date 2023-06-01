@@ -2,7 +2,7 @@ import os
 import time
 import logging
 import zipfile
-from seleniumwire import webdriver
+from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
@@ -175,23 +175,23 @@ class WebScraping ():
         if self.__mute__:
             options.add_argument("--mute-audio")
 
-        # # Set proxy without autentication
-        # if (self.__proxy_server__ and self.__proxy_port__
-        #         and not self.__proxy_user__ and not self.__proxy_pass__):
+        # Set proxy without autentication
+        if (self.__proxy_server__ and self.__proxy_port__
+                and not self.__proxy_user__ and not self.__proxy_pass__):
 
-        #     proxy = f"{self.__proxy_server__}:{self.__proxy_port__}"
-        #     options.add_argument(f"--proxy-server={proxy}")
+            proxy = f"{self.__proxy_server__}:{self.__proxy_port__}"
+            options.add_argument(f"--proxy-server={proxy}")
 
-        # # Set proxy with autentification
-        # if (self.__proxy_server__ and self.__proxy_port__
-        #         and self.__proxy_user__ and self.__proxy_pass__):
+        # Set proxy with autentification
+        if (self.__proxy_server__ and self.__proxy_port__
+                and self.__proxy_user__ and self.__proxy_pass__):
             
-        #     seleniumwire_options = {
-        #         'proxy': {
-        #             'http': f'http://{self.__proxy_user__}:{self.__proxy_pass__}@{self.__proxy_server__}:{self.__proxy_port__}',
-        #             'verify_ssl': True,
-        #         },
-        #     }
+            seleniumwire_options = {
+                'proxy': {
+                    'http': f'http://{self.__proxy_user__}:{self.__proxy_pass__}@{self.__proxy_server__}:{self.__proxy_port__}',
+                    'verify_ssl': True,
+                },
+            }
 
         # Set chrome folder
         if self.__chrome_folder__:
