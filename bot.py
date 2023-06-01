@@ -47,7 +47,6 @@ class Bot (WebScraping):
         self.twitch_url = f"https://www.twitch.tv/"
         self.twitch_url_login = f"https://www.twitch.tv/login/"
         self.twitch_url_stream = f"https://www.twitch.tv/{self.stream}"
-        self.twitch_url_stream_popup = f"https://player.twitch.tv/?channel={self.stream}&enableExtensions=true&muted=true&parent=twitch.tv&player=popout&quality=160p30&volume=1"
         self.status = "running"
         
         # Css selectors
@@ -55,13 +54,15 @@ class Bot (WebScraping):
             "twitch-logo": 'a[aria-label="Twitch Home"]',
             "twitch-login-btn": 'button[data-a-target="login-button"]',
             'start-stream-btn': 'button[data-a-target="player-overlay-mature-accept"]',
-            'stream-menu-btn': 'button[data-a-target="player-settings-button"]',
             'stream-quality-btn': 'button[data-a-target="player-settings-menu-item-quality"]',
             'stream-160p-btn': '[data-a-target="player-settings-menu"] > div:last-child input[name="player-settings-submenu-quality-option"]',
             'comment_textarea': '[role="textbox"]',
             'comment_send_btn': 'button[data-a-target="chat-send-button"]',
             'comment_accept_btn': 'button[data-test-selector="chat-rules-ok-button"]',
-            "offline_status": '.home .channel-status-info.channel-status-info--offline'
+            "offline_status": '.home .channel-status-info.channel-status-info--offline',
+            
+            'stream-menu-btn': 'button[data-a-target="player-settings-button"]',
+            "stream-popout-player": '[data-a-target="player-settings-menu"] > div:nth-child(5) > button',
             
         }
         
@@ -123,7 +124,7 @@ class Bot (WebScraping):
         """
         
         try:
-            self.set_page ("http://ipinfo.io/json")
+            # self.set_page ("http://ipinfo.io/json")
             self.set_page (self.twitch_url_login)
             self.refresh_selenium ()
         except:
@@ -200,7 +201,21 @@ class Bot (WebScraping):
         
         # Open stream in popup
         try:
-            self.set_page (self.twitch_url_stream_popup)
+            
+            # Click on menu button
+            self.click_js (self.selectors["stream-menu-btn"])
+            sleep (1)
+            self.refresh_selenium ()
+            
+            # Open popup
+            self.click_js (self.selectors["stream-popout-player"])
+            
+            # Close old window
+            self.switch_to_tab (0)
+            self.close_tab ()
+            self.switch_to_tab (0)
+            
+            
         except Exception as e:
             error = f"\t({self.stream} - {self.username}) popup error"
             
