@@ -147,8 +147,7 @@ class Bot (WebScraping):
                         
             # Set page
             super().__init__ (headless=self.headless, time_out=30,
-                            proxy_server=proxy["host"], proxy_port=proxy["port"], 
-                            proxy_user=proxy["user"], proxy_pass=proxy["password"],
+                            proxy_server=proxy["host"], proxy_port=proxy["port"],
                             width=self.width, height=self.height)
 
             proxy_working = self.__load_twitch__ ()    
@@ -267,8 +266,6 @@ if __name__ == "__main__":
         stream="darideveloper", 
         proxy_host="p.webshare.io", 
         proxy_port=80, 
-        proxy_user="gxqupdei-US-1", 
-        proxy_pass="44590csz5uyn" , 
         headless=False, 
         timeout=0.5
     )
