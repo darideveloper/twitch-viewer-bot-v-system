@@ -60,9 +60,9 @@ class Bot (WebScraping):
             'comment_send_btn': 'button[data-a-target="chat-send-button"]',
             'comment_accept_btn': 'button[data-test-selector="chat-rules-ok-button"]',
             "offline_status": '.home .channel-status-info.channel-status-info--offline',
-            
             'stream-menu-btn': 'button[data-a-target="player-settings-button"]',
             "stream-popout-player": '[data-a-target="player-settings-menu"] > div:nth-child(5) > button',
+            'stream-mature-btn': 'button[data-a-target="player-overlay-mature-accept"]'
             
         }
         
@@ -124,7 +124,7 @@ class Bot (WebScraping):
         """
         
         try:
-            # self.set_page ("http://ipinfo.io/json")
+            self.set_page ("http://ipinfo.io/json")
             self.set_page (self.twitch_url_login)
             self.refresh_selenium ()
         except:
@@ -201,20 +201,10 @@ class Bot (WebScraping):
         
         # Open stream in popup
         try:
-            
-            # Click on menu button
-            self.click_js (self.selectors["stream-menu-btn"])
+            # Accept mature content
+            self.click_js (self.selectors["stream-mature-btn"])
             sleep (1)
-            self.refresh_selenium ()
-            
-            # Open popup
-            self.click_js (self.selectors["stream-popout-player"])
-            
-            # Close old window
-            self.switch_to_tab (0)
-            self.close_tab ()
-            self.switch_to_tab (0)
-            
+            self.refresh_selenium ()            
             
         except Exception as e:
             error = f"\t({self.stream} - {self.username}) popup error"
