@@ -47,7 +47,7 @@ class Bot (WebScraping):
         self.twitch_url = f"https://www.twitch.tv/"
         self.twitch_url_login = f"https://www.twitch.tv/login/"
         self.twitch_url_stream = f"https://www.twitch.tv/{self.stream}"
-        self.twitch_url_chat = f"https://www.twitch.tv/popout/{self.stream}/chat?popout="
+        self.twitch_url_stream_popup = f"https://player.twitch.tv/?channel={self.stream}&enableExtensions=true&muted=true&parent=twitch.tv&player=popout&quality=160p30&volume=1"
         self.status = "running"
         
         # Css selectors
@@ -178,7 +178,6 @@ class Bot (WebScraping):
             error = f"\t({self.stream} - {self.username}) proxy error: {proxy['host']}:{proxy['port']} bot"
             return False
         
-        
         # Validte session with cookies
         login_button = self.get_elems (self.selectors["twitch-login-btn"])
         if login_button and self.username != "no-user":
@@ -198,25 +197,23 @@ class Bot (WebScraping):
             print (error)
             
             return False
-    
-        # Set stream options
+        
+        # Open stream in popup
         try:
-            self.__stream_options__ ()
+            self.set_page (self.twitch_url_stream_popup)
         except Exception as e:
+            error = f"\t({self.stream} - {self.username}) popup error"
             
             # Save error details
             with open (self.log_path, "a", encoding='UTF-8') as file:
                 file.write (f"{self.stream} - {self.username}: {str(e)}\n")
-                
-            error = f"\t({self.stream} - {self.username}) stream options error (but bot will continue)"
-            print (error)
             
             # Try to take screenshot
             try:
                 screenshot_path = os.path.join(self.screenshots_folder, "errors", f"{self.stream} - {self.username}.png")
                 self.screenshot (screenshot_path)
             except:
-                print (f"\t({self.stream} - {self.username}) error taking screenshot")
+                print (f"\t({self.stream} - {self.username}) error taking screenshot")            
            
         # Take screenshot
         if self.take_screenshots:
@@ -224,26 +221,6 @@ class Bot (WebScraping):
             self.screenshot (screenshot_path)
             
         return True
-
-    def __stream_options__ (self):
-        """ Set video options, like accept warnning and quality and
-        """
-                
-        # Accept mature content
-        start_stream_elem = self.get_elems (self.selectors["start-stream-btn"])
-        if start_stream_elem:
-            self.click_js (self.selectors["start-stream-btn"])
-            sleep (5)
-            self.refresh_selenium ()
-            
-        # Set lower wuality
-        self.click_js (self.selectors["stream-menu-btn"])
-        sleep (2)
-        self.refresh_selenium ()
-        self.click_js (self.selectors["stream-quality-btn"])
-        sleep (2)
-        self.refresh_selenium ()
-        self.click_js (self.selectors["stream-160p-btn"])
         
     def __send_message__ (self, message):
         
