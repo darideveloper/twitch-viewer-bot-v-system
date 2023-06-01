@@ -47,7 +47,6 @@ class Bot (WebScraping):
         self.twitch_url = f"https://www.twitch.tv/"
         self.twitch_url_login = f"https://www.twitch.tv/login/"
         self.twitch_url_stream = f"https://www.twitch.tv/{self.stream}"
-        self.twitch_url_chat = f"https://www.twitch.tv/popout/{self.stream}/chat?popout="
         self.status = "running"
         
         # Css selectors
@@ -55,13 +54,15 @@ class Bot (WebScraping):
             "twitch-logo": 'a[aria-label="Twitch Home"]',
             "twitch-login-btn": 'button[data-a-target="login-button"]',
             'start-stream-btn': 'button[data-a-target="player-overlay-mature-accept"]',
-            'stream-menu-btn': 'button[data-a-target="player-settings-button"]',
             'stream-quality-btn': 'button[data-a-target="player-settings-menu-item-quality"]',
             'stream-160p-btn': '[data-a-target="player-settings-menu"] > div:last-child input[name="player-settings-submenu-quality-option"]',
             'comment_textarea': '[role="textbox"]',
             'comment_send_btn': 'button[data-a-target="chat-send-button"]',
             'comment_accept_btn': 'button[data-test-selector="chat-rules-ok-button"]',
-            "offline_status": '.home .channel-status-info.channel-status-info--offline'
+            "offline_status": '.home .channel-status-info.channel-status-info--offline',
+            
+            'stream-menu-btn': 'button[data-a-target="player-settings-button"]',
+            "stream-popout-player": '[data-a-target="player-settings-menu"] > div:nth-child(5) > button',
             
         }
         
@@ -123,7 +124,7 @@ class Bot (WebScraping):
         """
         
         try:
-            self.set_page ("http://ipinfo.io/json")
+            # self.set_page ("http://ipinfo.io/json")
             self.set_page (self.twitch_url_login)
             self.refresh_selenium ()
         except:
@@ -178,7 +179,6 @@ class Bot (WebScraping):
             error = f"\t({self.stream} - {self.username}) proxy error: {proxy['host']}:{proxy['port']} bot"
             return False
         
-        
         # Validte session with cookies
         login_button = self.get_elems (self.selectors["twitch-login-btn"])
         if login_button and self.username != "no-user":
@@ -198,25 +198,37 @@ class Bot (WebScraping):
             print (error)
             
             return False
-    
-        # Set stream options
+        
+        # Open stream in popup
         try:
-            self.__stream_options__ ()
+            
+            # Click on menu button
+            self.click_js (self.selectors["stream-menu-btn"])
+            sleep (1)
+            self.refresh_selenium ()
+            
+            # Open popup
+            self.click_js (self.selectors["stream-popout-player"])
+            
+            # Close old window
+            self.switch_to_tab (0)
+            self.close_tab ()
+            self.switch_to_tab (0)
+            
+            
         except Exception as e:
+            error = f"\t({self.stream} - {self.username}) popup error"
             
             # Save error details
             with open (self.log_path, "a", encoding='UTF-8') as file:
                 file.write (f"{self.stream} - {self.username}: {str(e)}\n")
-                
-            error = f"\t({self.stream} - {self.username}) stream options error (but bot will continue)"
-            print (error)
             
             # Try to take screenshot
             try:
                 screenshot_path = os.path.join(self.screenshots_folder, "errors", f"{self.stream} - {self.username}.png")
                 self.screenshot (screenshot_path)
             except:
-                print (f"\t({self.stream} - {self.username}) error taking screenshot")
+                print (f"\t({self.stream} - {self.username}) error taking screenshot")            
            
         # Take screenshot
         if self.take_screenshots:
@@ -224,26 +236,6 @@ class Bot (WebScraping):
             self.screenshot (screenshot_path)
             
         return True
-
-    def __stream_options__ (self):
-        """ Set video options, like accept warnning and quality and
-        """
-                
-        # Accept mature content
-        start_stream_elem = self.get_elems (self.selectors["start-stream-btn"])
-        if start_stream_elem:
-            self.click_js (self.selectors["start-stream-btn"])
-            sleep (5)
-            self.refresh_selenium ()
-            
-        # Set lower wuality
-        self.click_js (self.selectors["stream-menu-btn"])
-        sleep (2)
-        self.refresh_selenium ()
-        self.click_js (self.selectors["stream-quality-btn"])
-        sleep (2)
-        self.refresh_selenium ()
-        self.click_js (self.selectors["stream-160p-btn"])
         
     def __send_message__ (self, message):
         
