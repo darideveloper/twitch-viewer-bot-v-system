@@ -47,6 +47,7 @@ class Bot (WebScraping):
         self.twitch_url = f"https://www.twitch.tv/"
         self.twitch_url_login = f"https://www.twitch.tv/login/"
         self.twitch_url_stream = f"https://www.twitch.tv/{self.stream}"
+        self.twitch_url_pupup = f"https://player.twitch.tv/?channel={self.stream}&enableExtensions=true&muted=true&parent=twitch.tv&player=popout&quality=160p30&volume=0.5"
         self.status = "running"
         
         # Css selectors
@@ -201,7 +202,7 @@ class Bot (WebScraping):
         # Open stream in popup
         try:
             # Accept mature content
-            self.click_js (self.selectors["stream-mature-btn"])
+            self.set_page (self.twitch_url_pupup)
             sleep (1)
             self.refresh_selenium ()            
             
@@ -218,7 +219,14 @@ class Bot (WebScraping):
                 self.screenshot (screenshot_path)
             except:
                 print (f"\t({self.stream} - {self.username}) error taking screenshot")            
-           
+
+        # Accept mature content
+        start_stream_elem = self.get_elems (self.selectors["start-stream-btn"])
+        if start_stream_elem:
+            self.click_js (self.selectors["start-stream-btn"])
+            sleep (5)
+            self.refresh_selenium ()
+    
         # Take screenshot
         if self.take_screenshots:
             screenshot_path = os.path.join(self.screenshots_folder, f"{self.stream} - {self.username}.png")
