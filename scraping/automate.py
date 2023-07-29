@@ -1,5 +1,6 @@
 import os
 import time
+import random
 import logging
 import zipfile
 from selenium import webdriver
@@ -7,7 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from webdriver_manager.chrome import ChromeDriverManager, ChromeType
+from webdriver_manager.chrome import ChromeDriverManager
 
 current_file = os.path.basename(__file__)
 
@@ -30,7 +31,7 @@ class WebScraping ():
                  chrome_folder="", user_agent=False, capabilities=False,
                  download_folder="", extensions=[], incognito=False, experimentals=True,
                  start_killing=False, start_openning:bool=True, width:int=1280, height:int=720,
-                 mute:bool=True):
+                 mute:bool=True, chrome_driver:ChromeDriverManager=None):
         """ Constructor of the class
 
         Args:
@@ -52,6 +53,7 @@ class WebScraping ():
             width (int, optional): Width of the window. Defaults to 1280.
             height (int, optional): Height of the window. Defaults to 720.
             mute (bool, optional): Mute the audio of the window. Defaults to True.
+            chrome_driver (ChromeDriverManager, optional): Chrome driver manager. Defaults to None.
         """
 
         self.basetime = 1
@@ -75,6 +77,8 @@ class WebScraping ():
         self.__width__ = width
         self.__height__ = height
         self.__mute__ = mute
+        
+        self.chrome_driver = chrome_driver
         
         self.__web_page__ = None
 
@@ -229,12 +233,18 @@ class WebScraping ():
             options.add_argument(
                 "--disable-blink-features=AutomationControlled")
 
-        # Set configuration to  and create instance
-        chromedriver = ChromeDriverManager(chrome_type=ChromeType.GOOGLE).install()
-        self.driver = webdriver.Chrome(chromedriver,
-                                       options=options,
-                                       service_log_path=None,
-                                       desired_capabilities=capabilities)
+        # Set configuration to and create instance
+        while True:
+            try:
+                self.driver = webdriver.Chrome(self.chrome_driver,
+                                            options=options,
+                                            service_log_path=None,
+                                            desired_capabilities=capabilities)
+            except Exception as err:
+                time.sleep (random.randint (1, 10)/10)
+                continue
+            else:
+                break
 
     def __create_proxy_extesion__(self):
         """Create a proxy chrome extension"""

@@ -1,11 +1,10 @@
 import os
 import random
 from time import sleep
-from concurrent.futures import ThreadPoolExecutor
-
+from threading import Thread
+from webdriver_manager.chrome import ChromeDriverManager, ChromeType
 from api import Api
 from bot import Bot
-
 from dotenv import load_dotenv
 
 load_dotenv ()
@@ -15,6 +14,9 @@ DEBUG_USERS = os.getenv ("DEBUG_USERS")
 if DEBUG_USERS and DEBUG_USERS != "":
     DEBUG_USERS = DEBUG_USERS.split (",")
 DIABLE_THREADS = os.getenv ("DIABLE_THREADS") == "true"
+
+# Chrome driver instance
+CHROME_DRIVER = ChromeDriverManager(chrome_type=ChromeType.GOOGLE).install()
 
 class BotsManager ():
     """ Watch Twitch stream with a multiple users, using cookies to login """
@@ -38,10 +40,7 @@ class BotsManager ():
         
         # Separator
         print ()
-        
-        # Create threads executor
-        executor = ThreadPoolExecutor(max_workers=self.settings["threads"])
-        
+                
         bots_running = {}
         for stream in self.streams:
             bots_running[stream] = []
@@ -56,6 +55,13 @@ class BotsManager ():
                         
             # Generate specific number of bots, from settings
             current_bots = 0
+            
+            # Headless mode
+            headless = self.settings["headless"]
+            if DEBUG:
+                # Force headless mode
+                headless = False
+                
             for _ in range(self.settings["viwers-stream"]):
                                 
                 # Default user
@@ -70,13 +76,6 @@ class BotsManager ():
                     user = random.choice (stream_users)
                     stream_users.remove (user)
                 
-                # Debug options
-                headless = self.settings["headless"]
-                if DEBUG:
-                    
-                    # Force headless mode
-                    headless = False
-                
                     # Only start debug users
                     if DEBUG_USERS and user["name"] not in DEBUG_USERS:
                         continue
@@ -84,7 +83,8 @@ class BotsManager ():
                 try:
                     bot = Bot (user["name"], user["cookies"], stream, self.proxies,
                             headless=headless, width=self.settings["window-width"], height=self.settings["window-height"],
-                            take_screenshots=self.settings["screenshots"], bots_running=bots_running[stream])
+                            take_screenshots=self.settings["screenshots"], bots_running=bots_running[stream],
+                            chrome_driver=CHROME_DRIVER)
                 except Exception as e:
                     error = f"\t({self.stream} - {self.username}) error creating bot"
                     print (error)
@@ -94,8 +94,8 @@ class BotsManager ():
                         file.write (f"{self.stream} - {self.username}: {str(e)}\n")
                     
                 else:
-                    # Start bot in a thread
-                    executor.submit (self.__auto_run_bot__, bot)
+                    thread = Thread (target=self.__auto_run_bot__, args=(bot,))
+                    thread.start ()
                     
                     # Wait random time 
                     sleep (random.randint (1, 10)/10)
@@ -110,7 +110,7 @@ class BotsManager ():
                     # End of threads, wait 1 minute
                     elif current_bots == self.settings["threads"]:
                         current_bots = 0
-                        sleep (2)
+                        sleep (8)
                         print (f"\nWaiting 1 minutes before start next {self.settings['threads']} bots...\n")
                         sleep (60)
                         
@@ -127,8 +127,8 @@ class BotsManager ():
         """
         
         # Random delay to start
-        delay = random.randint (1, 30)
-        sleep (delay/10)
+        delay = random.randint (1, 30)/5
+        sleep (delay)
         
         bot.auto_run ()
         
