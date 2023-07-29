@@ -55,6 +55,7 @@ class BotsManager ():
             stream_users = self.users.copy ()
                         
             # Generate specific number of bots, from settings
+            current_bots = 0
             for _ in range(self.settings["viwers-stream"]):
                                 
                 # Default user
@@ -93,11 +94,25 @@ class BotsManager ():
                         file.write (f"{self.stream} - {self.username}: {str(e)}\n")
                     
                 else:
+                    # Start bot in a thread
+                    executor.submit (self.__auto_run_bot__, bot)
+                    
+                    # Wait random time 
+                    sleep (random.randint (1, 10)/10)
+                    
+                    # Increase current bots
+                    current_bots += 1
+                    
                     # Start bot in a thread if no error
                     if DIABLE_THREADS:
-                        bot.auto_run ()
-                    else:
-                        executor.submit (self.__auto_run_bot__, bot) 
+                        continue
+                    
+                    # End of threads, wait 1 minute
+                    elif current_bots == self.settings["threads"]:
+                        current_bots = 0
+                        sleep (2)
+                        print (f"\nWaiting 1 minutes before start next {self.settings['threads']} bots...\n")
+                        sleep (60)
                         
         # Infinity loop to watch stream
         print ("Bot running...")
