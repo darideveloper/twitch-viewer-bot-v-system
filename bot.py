@@ -55,7 +55,7 @@ class Bot (WebScraping):
         self.selectors = {
             "twitch-logo": 'a[aria-label="Twitch Home"]',
             "twitch-login-btn": 'button[data-a-target="login-button"]',
-            'start-stream-btn': 'button[data-a-target="player-overlay-mature-accept"]',
+            'start-stream-btn': 'button[data-a-target*="start-watching"]',
             'stream-quality-btn': 'button[data-a-target="player-settings-menu-item-quality"]',
             'stream-160p-btn': '[data-a-target="player-settings-menu"] > div:last-child input[name="player-settings-submenu-quality-option"]',
             'comment_textarea': '[role="textbox"]',

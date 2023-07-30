@@ -138,9 +138,13 @@ class Api ():
 
         print("getting streams...")
 
+        # Debug
+        # return ["darideveloper"]
+
         # Get data from api
         res = self.__requests_url__("streams")
         return res.json()
+        
     
     def disable_user (self, username:str): 
         """ Disable user in the API
