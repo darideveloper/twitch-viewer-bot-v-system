@@ -26,6 +26,7 @@ class BotsManager ():
         
         # Connect to api
         api = Api ()
+        self.api = api
         
         self.streams = api.get_streams ()
         
@@ -86,12 +87,17 @@ class BotsManager ():
                             take_screenshots=self.settings["screenshots"], bots_running=bots_running[stream],
                             chrome_driver=CHROME_DRIVER)
                 except Exception as e:
-                    error = f"\t({self.stream} - {self.username}) error creating bot"
+                    error = f"{self.stream} - {self.username}: Error creating bot instance: {str(e)}\n"
                     print (error)
                     
                     # Save error details
                     with open (self.log_path, "a", encoding='UTF-8') as file:
-                        file.write (f"{self.stream} - {self.username}: {str(e)}\n")
+                        file.write (error)
+                    
+                    # Save error in api
+                    self.api.log_error (error)
+                    
+                    quit ()
                     
                 else:
                     thread = Thread (target=self.__auto_run_bot__, args=(bot,))

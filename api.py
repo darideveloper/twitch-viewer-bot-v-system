@@ -156,6 +156,20 @@ class Api ():
         res = self.__requests_url__("disable-user/" + username)
         print (f"\t{username}: {res.text}")
         
+    def log_error (self, error:str):
+        """ Log error in the API
+
+        Args:
+            error (str): error message
+        """
+        
+        url = f"{API_HOST}/log-error/?token={TOKEN}"
+        try:
+            res = requests.post (url, json={"error": error})
+            res.raise_for_status()
+        except:
+            print ("Error saving error to API")
+    
 if __name__ == "__main__":
     api = Api()
     api.disable_user("vegetta_pelon")

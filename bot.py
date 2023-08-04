@@ -1,11 +1,11 @@
 import os
 import json
 import random
-from dotenv import load_dotenv
 from time import sleep
+from dotenv import load_dotenv
 from scraping.automate import WebScraping
-from api import Api
 from webdriver_manager.chrome import ChromeDriverManager
+from api import Api
 
 load_dotenv ()
 
@@ -146,12 +146,37 @@ class Bot (WebScraping):
         
             # Get random proxy for current bot
             proxy = self.__get_random_proxy__ ()
-                        
-            # Set page
-            super().__init__ (headless=self.headless, time_out=30,
-                            proxy_server=proxy["host"], proxy_port=proxy["port"],
-                            width=self.width, height=self.height, 
-                            chrome_driver=self.chrome_driver)
+            
+            browser_opened = False
+            error = ""
+            for _ in range (2):
+                # Try to start chrome
+                try:
+                    super().__init__ (headless=self.headless, time_out=30,
+                                    proxy_server=proxy["host"], proxy_port=proxy["port"],
+                                    width=self.width, height=self.height, 
+                                    chrome_driver=self.chrome_driver)
+                except Exception as e:
+                    error = e
+                    print (f"\t({self.stream} - {self.username}), error opening browser, trying again in 1 minute...")
+                    sleep (60)
+                    continue
+                else:
+                    browser_opened = True
+                    break
+                
+            if not browser_opened:
+                error = f"\t({self.stream} - {self.username}): error opening browser, and max retries reached: ({error})"
+                print (error)
+                
+                # Save error details
+                with open (self.log_path, "a", encoding='UTF-8') as file:
+                    file.write (error)
+                
+                # Save error in api
+                self.api.log_error (error)
+                
+                quit ()
 
             proxy_working = self.__load_twitch__ ()    
             
