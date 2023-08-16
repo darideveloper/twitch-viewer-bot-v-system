@@ -48,34 +48,34 @@ Project type: **client**
 
 # Details
 
-The bot manage multiple chrome windows for manage bots. 
-It don't login with the accounts, instead of that, the bot use cookies already saved in a Backend service. 
-All information required, like users, streams to watch, comments, donations, etc; its provided from a Django private app backend.
-
-## Features
-
-* Login with cookies
-* Use proxies
-* Watch streams during a specific time
+The bot manage multiple chrome windows for manage bots. 
+It don't login with the accounts, instead of that, the bot use cookies already saved in a Backend service. 
+All information required, like users, streams to watch, comments, donations, etc; its provided from a Django private app backend.
+
+## Features
+
+* Login with cookies
+* Use proxies
+* Watch streams during a specific time
 * Comment streams (coming soon)
 
 # Roadmap
 
-- [x] Use cookies to avoid login
-- [x] Run multiple bots with multithreading
-- [x] Get data from backend
-- [x] Show counters of bots running
-- [x] Detect no streams found (no streams provided from the backend)
-- [x] Detect no live streams
-- [x] Detect no more active bots available
-- [x] Detect proxy errors
-- [x] Detect cookies errors
-- [x] Take screen shots
-- [x] Chrome in headless
-- [x] Options from backend
-- [x] Disable bots in backend, with invalid cookies
-- [x] Debug mode
-- [x] Mute streams
-- [x] Kill all chrome process when starts
+- [x] Use cookies to avoid login
+- [x] Run multiple bots with multithreading
+- [x] Get data from backend
+- [x] Show counters of bots running
+- [x] Detect no streams found (no streams provided from the backend)
+- [x] Detect no live streams
+- [x] Detect no more active bots available
+- [x] Detect proxy errors
+- [x] Detect cookies errors
+- [x] Take screen shots
+- [x] Chrome in headless
+- [x] Options from backend
+- [x] Disable bots in backend, with invalid cookies
+- [x] Debug mode
+- [x] Mute streams
+- [x] Kill all chrome process when starts
 - [ ] Random comments in streams
 
