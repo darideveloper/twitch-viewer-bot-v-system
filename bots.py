@@ -42,78 +42,86 @@ class BotsManager ():
         for stream in self.streams:
             bots_running[stream] = []
             
+        # Headless mode
+        headless = self.settings["headless"]
+        if DEBUG:
+            # Force headless mode
+            headless = False
+            
+        stream_users = self.users.copy ()
+        
         # Create bots to each stream
-        for stream in self.streams:
+        current_stream_id = 0
+        bots_total = self.settings["viwers-stream"]*len(self.streams)
+        current_bots = 0
+        for _ in range(bots_total):
+            
+            # Get current stream
+            stream = self.streams[current_stream_id]
             
             if not self.proxies:
                 continue
+                                                    
+            # Default user
+            user = {
+                "name": "no-user",
+                "cookies": [],
+                "is_active": True
+            }
             
-            stream_users = self.users.copy ()
-                        
-            # Generate specific number of bots, from settings
-            current_bots = 0
+            # Get random user
+            if stream_users:
+                user = random.choice (stream_users)
+                stream_users.remove (user)
             
-            # Headless mode
-            headless = self.settings["headless"]
-            if DEBUG:
-                # Force headless mode
-                headless = False
+                # Only start debug users
+                if DEBUG_USERS and user["name"] not in DEBUG_USERS:
+                    continue
+            
+            try:
+                bot = Bot (user["name"], user["cookies"], stream, self.proxies,
+                        headless=headless, width=self.settings["window-width"], height=self.settings["window-height"],
+                        take_screenshots=self.settings["screenshots"], bots_running=bots_running[stream])
+            except Exception as e:
+                error = f"{self.stream} - {self.username}: Error creating bot instance: {str(e)}\n"
+                print (error)
                 
-            for _ in range(self.settings["viwers-stream"]):
-                                
-                # Default user
-                user = {
-                    "name": "no-user",
-                    "cookies": [],
-                    "is_active": True
-                }
+                # Save error details
+                with open (self.log_path, "a", encoding='UTF-8') as file:
+                    file.write (error)
                 
-                # Get random user
-                if stream_users:
-                    user = random.choice (stream_users)
-                    stream_users.remove (user)
+                # Save error in api
+                self.api.log_error (error)
                 
-                    # Only start debug users
-                    if DEBUG_USERS and user["name"] not in DEBUG_USERS:
-                        continue
+                quit ()
                 
-                try:
-                    bot = Bot (user["name"], user["cookies"], stream, self.proxies,
-                            headless=headless, width=self.settings["window-width"], height=self.settings["window-height"],
-                            take_screenshots=self.settings["screenshots"], bots_running=bots_running[stream])
-                except Exception as e:
-                    error = f"{self.stream} - {self.username}: Error creating bot instance: {str(e)}\n"
-                    print (error)
+            else:
+                thread = Thread (target=self.__auto_run_bot__, args=(bot,))
+                thread.start ()
+                
+                # Wait random time 
+                sleep (random.randint (1, 10)/10)
+                
+                # Increase current bots
+                current_bots += 1
+                
+                # Start bot in a thread if no error
+                if DIABLE_THREADS:
+                    continue
+                
+                # End of threads, wait 1 minute
+                elif current_bots == self.settings["threads"]:
                     
-                    # Save error details
-                    with open (self.log_path, "a", encoding='UTF-8') as file:
-                        file.write (error)
+                    # Change stream
+                    current_stream_id += 1
+                    if current_stream_id == len(self.streams):
+                        current_stream_id = 0
                     
-                    # Save error in api
-                    self.api.log_error (error)
-                    
-                    quit ()
-                    
-                else:
-                    thread = Thread (target=self.__auto_run_bot__, args=(bot,))
-                    thread.start ()
-                    
-                    # Wait random time 
-                    sleep (random.randint (1, 10)/10)
-                    
-                    # Increase current bots
-                    current_bots += 1
-                    
-                    # Start bot in a thread if no error
-                    if DIABLE_THREADS:
-                        continue
-                    
-                    # End of threads, wait 1 minute
-                    elif current_bots == self.settings["threads"]:
-                        current_bots = 0
-                        sleep (8)
-                        print (f"\nWaiting 1 minutes before start next {self.settings['threads']} bots...\n")
-                        sleep (60)
+                    # Wait before next bots
+                    current_bots = 0
+                    sleep (8)
+                    print (f"\nWaiting 1 minutes before start next {self.settings['threads']} bots...\n")
+                    sleep (60)
                         
         # Infinity loop to watch stream
         print ("Bot running...")

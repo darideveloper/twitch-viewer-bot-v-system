@@ -109,7 +109,7 @@ class Bot (WebScraping):
             # Save bot in list of bots running
             self.bots_running.append (self)
             
-            print (f"\t({self.stream} - {self.username}) Bot running (total bots in stream: {len (self.bots_running)})")
+            print (f"\t({self.stream} - {self.username}) Bot running (total bots in all stream: {len (self.bots_running)})")
             
         else:
             # Force end bot
