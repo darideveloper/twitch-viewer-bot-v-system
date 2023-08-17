@@ -2,7 +2,6 @@ import os
 import random
 from time import sleep
 from threading import Thread
-from webdriver_manager.chrome import ChromeDriverManager, ChromeType
 from api import Api
 from bot import Bot
 from dotenv import load_dotenv
@@ -14,9 +13,6 @@ DEBUG_USERS = os.getenv ("DEBUG_USERS")
 if DEBUG_USERS and DEBUG_USERS != "":
     DEBUG_USERS = DEBUG_USERS.split (",")
 DIABLE_THREADS = os.getenv ("DIABLE_THREADS") == "true"
-
-# Chrome driver instance
-CHROME_DRIVER = ChromeDriverManager(chrome_type=ChromeType.GOOGLE).install()
 
 class BotsManager ():
     """ Watch Twitch stream with a multiple users, using cookies to login """
@@ -84,8 +80,7 @@ class BotsManager ():
                 try:
                     bot = Bot (user["name"], user["cookies"], stream, self.proxies,
                             headless=headless, width=self.settings["window-width"], height=self.settings["window-height"],
-                            take_screenshots=self.settings["screenshots"], bots_running=bots_running[stream],
-                            chrome_driver=CHROME_DRIVER)
+                            take_screenshots=self.settings["screenshots"], bots_running=bots_running[stream])
                 except Exception as e:
                     error = f"{self.stream} - {self.username}: Error creating bot instance: {str(e)}\n"
                     print (error)

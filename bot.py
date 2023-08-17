@@ -3,8 +3,7 @@ import json
 import random
 from time import sleep
 from dotenv import load_dotenv
-from scraping.automate import WebScraping
-from webdriver_manager.chrome import ChromeDriverManager
+from scraping.web_scraping import WebScraping
 from api import Api
 
 load_dotenv ()
@@ -16,7 +15,7 @@ class Bot (WebScraping):
     
     def __init__ (self, username:str, cookies:list, stream:str, proxies:list,
                   headless:bool=False, width:int=1920, height:int=1080, take_screenshots:bool=False,
-                  bots_running:list=[], chrome_driver:ChromeDriverManager=None) -> bool:
+                  bots_running:list=[]) -> bool:
         """ Contructor of class. Start viwer bot
 
         Args:
@@ -29,7 +28,6 @@ class Bot (WebScraping):
             height (int, optional): height of browser window. Defaults to 1080
             take_screenshots (bool, optional): take screenshots in headless mode. Defaults to False   
             bots_running (list, optional): list of bots already running. Defaults to [] 
-            chrome_driver (ChromeDriverManager, optional): chrome driver instance. Defaults to None
         """
         
         # Save class variables and start browser
@@ -42,7 +40,6 @@ class Bot (WebScraping):
         self.height = height
         self.take_screenshots = take_screenshots
         self.bots_running = bots_running
-        self.chrome_driver = chrome_driver
         
         # Urls and status
         self.twitch_url = f"https://www.twitch.tv/"
@@ -154,8 +151,7 @@ class Bot (WebScraping):
                 try:
                     super().__init__ (headless=self.headless, time_out=30,
                                     proxy_server=proxy["host"], proxy_port=proxy["port"],
-                                    width=self.width, height=self.height, 
-                                    chrome_driver=self.chrome_driver)
+                                    width=self.width, height=self.height)
                 except Exception as e:
                     error = e
                     print (f"\t({self.stream} - {self.username}), error opening browser, trying again in 1 minute...")
