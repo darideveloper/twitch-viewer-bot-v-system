@@ -170,7 +170,7 @@ class Bot (WebScraping):
                     file.write (error)
                 
                 # Save error in api
-                # self.api.log_error (error)
+                self.api.log_error (error)
                 
                 quit ()
 
