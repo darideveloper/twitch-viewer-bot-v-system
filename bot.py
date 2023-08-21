@@ -1,6 +1,5 @@
 import os
 import json
-import random
 from time import sleep
 from dotenv import load_dotenv
 from scraping.web_scraping import WebScraping
@@ -13,7 +12,7 @@ DEBUG = os.getenv ("DEBUG") == "true"
 class Bot (WebScraping):
     """ Bot for watch Twitch stream, using cookies to login """
     
-    def __init__ (self, username:str, cookies:list, stream:str, proxies:list,
+    def __init__ (self, username:str, cookies:list, stream:str, proxy:dict,
                   headless:bool=False, width:int=1920, height:int=1080, take_screenshots:bool=False,
                   bots_running:list=[]) -> bool:
         """ Contructor of class. Start viwer bot
@@ -22,7 +21,7 @@ class Bot (WebScraping):
             username (str): name of user to login
             cookies (list): cookies for login, generated with chrome extension "EditThisCookie"
             stream (str): user stream to watch
-            proxies (list): list of proxies to use
+            proxy (dict): list of proxies to use
             headless (bool, optional): use headless mode (hide browser). Defaults to False
             width (int, optional): width of browser window. Defaults to 1920
             height (int, optional): height of browser window. Defaults to 1080
@@ -34,7 +33,7 @@ class Bot (WebScraping):
         self.username = username
         self.cookies = cookies
         self.stream = stream
-        self.proxies = proxies
+        self.proxy = proxy
         self.headless = headless
         self.width = width
         self.height = height
@@ -76,22 +75,6 @@ class Bot (WebScraping):
         
         # Api connection
         self.api = Api ()
-        
-    def __get_random_proxy__ (self) -> dict:
-        """ Get random proxy from list and remove it
-
-        Returns:
-            dict: random proxy
-        """
-        
-        # Validate if there are proxies free
-        if not self.proxies:
-            return False
-        
-        proxy = random.choice (self.proxies)
-        self.proxies.remove (proxy)
-        
-        return proxy
     
     def auto_run (self) -> str:
         """ Auto start browser, watch stream and close browser in background
@@ -140,9 +123,6 @@ class Bot (WebScraping):
         
         # Load fot load page and find proxy
         while True:
-        
-            # Get random proxy for current bot
-            proxy = self.__get_random_proxy__ ()
             
             browser_opened = False
             error = ""
@@ -150,7 +130,7 @@ class Bot (WebScraping):
                 # Try to start chrome
                 try:
                     super().__init__ (headless=self.headless, time_out=30,
-                                    proxy_server=proxy["host"], proxy_port=proxy["port"],
+                                    proxy_server=self.proxy["host"], proxy_port=self.proxy["port"],
                                     width=self.width, height=self.height)
                 except Exception as e:
                     error = e

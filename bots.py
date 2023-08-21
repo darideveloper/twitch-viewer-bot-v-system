@@ -8,11 +8,12 @@ from dotenv import load_dotenv
 
 load_dotenv ()
 
-DEBUG = os.getenv ("DEBUG") == "true"
-DEBUG_USERS = os.getenv ("DEBUG_USERS")
-if DEBUG_USERS and DEBUG_USERS != "":
-    DEBUG_USERS = DEBUG_USERS.split (",")
-DIABLE_THREADS = os.getenv ("DIABLE_THREADS") == "true"
+HEADLESS = os.getenv("HEADLESS") == True
+VIWERS_STREAM = int(os.getenv("VIWERS_STREAM"))
+WINDOW_WIDTH = int(os.getenv("WINDOW_WIDTH"))
+WINDOW_HEIGHT = int(os.getenv("WINDOW_HEIGHT"))
+SCREENSHOTS = os.getenv("SCREENSHOTS")
+THREADS = int(os.getenv("THREADS"))
 
 class BotsManager ():
     """ Watch Twitch stream with a multiple users, using cookies to login """
@@ -24,43 +25,32 @@ class BotsManager ():
         api = Api ()
         self.api = api
         
-        self.streams = api.get_streams ()
+        self.streams = self.api.get_streams ()
         
         # Show error and stop when no stream founnd
         if not self.streams:
             print (f"No streams found.")
             return None
         
-        self.users = api.get_users ()
-        self.settings = api.get_settings ()
-        self.proxies = api.get_proxies ()
+        self.users = self.api.get_users ()
         
         # Separator
         print ()
                 
         bots_running = {}
         for stream in self.streams:
-            bots_running[stream] = []
-            
-        # Headless mode
-        headless = self.settings["headless"]
-        if DEBUG:
-            # Force headless mode
-            headless = False
+            bots_running[stream["streamer"]] = []
             
         stream_users = self.users.copy ()
         
         # Create bots to each stream
         current_stream_id = 0
-        bots_total = self.settings["viwers-stream"]*len(self.streams)
+        bots_total = VIWERS_STREAM*len(self.streams)
         current_bots = 0
         for _ in range(bots_total):
             
             # Get current stream
             stream = self.streams[current_stream_id]
-            
-            if not self.proxies:
-                continue
                                                     
             # Default user
             user = {
@@ -74,16 +64,13 @@ class BotsManager ():
                 user = random.choice (stream_users)
                 stream_users.remove (user)
             
-                # Only start debug users
-                if DEBUG_USERS and user["name"] not in DEBUG_USERS:
-                    continue
-            
+            streamer = stream["streamer"]
             try:
-                bot = Bot (user["name"], user["cookies"], stream, self.proxies,
-                        headless=headless, width=self.settings["window-width"], height=self.settings["window-height"],
-                        take_screenshots=self.settings["screenshots"], bots_running=bots_running[stream])
+                bot = Bot (user["user"], user["cookies"], streamer, self.api.get_proxy(),
+                        headless=HEADLESS, width=WINDOW_WIDTH, height=WINDOW_HEIGHT,
+                        take_screenshots=SCREENSHOTS, bots_running=bots_running[streamer])
             except Exception as e:
-                error = f"{self.stream} - {self.username}: Error creating bot instance: {str(e)}\n"
+                error = f"{streamer} - {self.username}: Error creating bot instance: {str(e)}\n"
                 print (error)
                 
                 # Save error details
@@ -105,12 +92,8 @@ class BotsManager ():
                 # Increase current bots
                 current_bots += 1
                 
-                # Start bot in a thread if no error
-                if DIABLE_THREADS:
-                    continue
-                
                 # End of threads, wait 1 minute
-                elif current_bots == self.settings["threads"]:
+                if current_bots == THREADS:
                     
                     # Change stream
                     current_stream_id += 1
@@ -120,7 +103,7 @@ class BotsManager ():
                     # Wait before next bots
                     current_bots = 0
                     sleep (8)
-                    print (f"\nWaiting 1 minutes before start next {self.settings['threads']} bots...\n")
+                    print (f"\nWaiting 1 minutes before start next {THREADS} bots...\n")
                     sleep (60)
                         
         # Infinity loop to watch stream
