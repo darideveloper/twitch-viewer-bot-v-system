@@ -1,5 +1,6 @@
 import os
 import json
+from threading import Thread
 from time import sleep
 from dotenv import load_dotenv
 from scraping.web_scraping import WebScraping
@@ -14,7 +15,7 @@ class Bot (WebScraping):
     
     def __init__ (self, username:str, cookies:list, stream:str, proxy:dict,
                   headless:bool=False, width:int=1920, height:int=1080, take_screenshots:bool=False,
-                  bots_running:list=[]) -> bool:
+                  bots_running:list=[], running_seconds:int=0) -> bool:
         """ Contructor of class. Start viwer bot
 
         Args:
@@ -39,6 +40,7 @@ class Bot (WebScraping):
         self.height = height
         self.take_screenshots = take_screenshots
         self.bots_running = bots_running
+        self.running_seconds = running_seconds
         
         # Urls and status
         self.twitch_url = f"https://www.twitch.tv/"
@@ -94,6 +96,10 @@ class Bot (WebScraping):
             
             print (f"\t({self.stream} - {self.username}) Bot running (total bots in all stream: {len (self.bots_running)})")
             
+            # Start tread for kill chrome when stream ends
+            thread = Thread (target=self.__kill_bot__, args=())
+            thread.start ()
+            
         else:
             # Force end bot
             self.driver.quit ()
@@ -120,56 +126,43 @@ class Bot (WebScraping):
         Returns:
             bool: True if browser started, False if not
         """
-        
-        # Load fot load page and find proxy
-        while True:
             
-            browser_opened = False
-            error = ""
-            for _ in range (2):
-                # Try to start chrome
-                try:
-                    super().__init__ (headless=self.headless, time_out=30,
-                                    proxy_server=self.proxy["host"], proxy_port=self.proxy["port"],
-                                    width=self.width, height=self.height)
-                except Exception as e:
-                    error = e
-                    print (f"\t({self.stream} - {self.username}), error opening browser, trying again in 1 minute...")
-                    sleep (60)
-                    continue
-                else:
-                    browser_opened = True
-                    break
-                
-            if not browser_opened:
-                error = f"\t({self.stream} - {self.username}): error opening browser, and max retries reached: ({error})"
-                print (error)
-                
-                # Save error details
-                with open (self.log_path, "a", encoding='UTF-8') as file:
-                    file.write (error)
-                
-                # Save error in api
-                self.api.log_error (error)
-                
-                quit ()
-
-            proxy_working = self.__load_twitch__ ()    
-            
-            if not proxy_working:
-                error = f"\t({self.stream} - {self.username}) proxy error: {proxy['host']}:{proxy['port']}. Retrying..."
-                print (error)
-                
-                # End if there are not proxies
-                if not self.proxies:
-                    print (f"\t({self.stream} - {self.username}) No more proxies available")                    
-                    return False
-                
-                # Try again with other proxy
+        browser_opened = False
+        error = ""
+        for _ in range (2):
+            # Try to start chrome
+            try:
+                super().__init__ (headless=self.headless, time_out=30,
+                                proxy_server=self.proxy["host"], proxy_port=self.proxy["port"],
+                                width=self.width, height=self.height)
+            except Exception as e:
+                error = e
+                print (f"\t({self.stream} - {self.username}), error opening browser, trying again in 1 minute...")
+                sleep (60)
                 continue
+            else:
+                browser_opened = True
+                break
             
-            # End loop if proxy is working
-            break
+        if not browser_opened:
+            error = f"\t({self.stream} - {self.username}): error opening browser, and max retries reached: ({error})"
+            print (error)
+            
+            # Save error details
+            with open (self.log_path, "a", encoding='UTF-8') as file:
+                file.write (error)
+            
+            # Save error in api
+            self.api.log_error (error)
+            
+            quit ()
+
+        proxy_working = self.__load_twitch__ ()    
+        
+        if not proxy_working:
+            error = f"\t({self.stream} - {self.username}) proxy error: {self.proxy['host']}:{self.proxy['port']}. Retrying..."
+            print (error)
+            return False
             
         # Load cookies
         if self.username != "no-user":
@@ -179,7 +172,7 @@ class Bot (WebScraping):
         try:
             self.set_page (self.twitch_url_stream)
         except Exception as e:
-            error = f"\t({self.stream} - {self.username}) proxy error: {proxy['host']}:{proxy['port']} bot"
+            error = f"\t({self.stream} - {self.username}) proxy error: {self.proxy['host']}:{self.proxy['port']} bot"
             return False
         
         # Validte session with cookies
@@ -234,37 +227,14 @@ class Bot (WebScraping):
         if self.take_screenshots:
             screenshot_path = os.path.join(self.screenshots_folder, f"{self.stream} - {self.username}.png")
             self.screenshot (screenshot_path)
-            
+    
         return True
         
-    def __send_message__ (self, message):
+    def __kill_bot__ (self): 
         
-        # Validate if constrols are visible
-        comment_textarea = self.get_elems (self.selectors["comment_textarea"])
-        comment_send_btn = self.get_elems (self.selectors["comment_send_btn"])
-        if not comment_textarea or not comment_send_btn:
-            raise Exception ("Controls not visible")
-        
-        # Write message
-        sleep (3)
-        self.refresh_selenium ()
-        self.send_data (self.selectors["comment_textarea"], message)
-        
-        # Accept chat rules
-        sleep (1)
-        self.refresh_selenium ()
-        comment_accept_elem = self.get_elems (self.selectors["comment_accept_btn"])
-        if comment_accept_elem:
-            self.click_js (self.selectors["comment_accept_btn"])
-            sleep (1)
-            self.refresh_selenium ()
-        
-        
-            # Write and submit message
-            self.send_data (self.selectors["comment_textarea"], message)
-            sleep (2)
-            
-        self.click_js (self.selectors["comment_send_btn"])       
+        sleep (self.running_seconds)
+        print (f"\t({self.stream} - {self.username}) Killing bot...")
+        self.end_browser ()
 
         
 if __name__ == "__main__":

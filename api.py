@@ -107,7 +107,7 @@ class Api ():
             }
         """
         
-        print (f"\t{LOGS_PREFIX} Getting a random proxy...")
+        print (f"{LOGS_PREFIX} Getting a random proxy...")
         
         # Get data from api
         proxy = random.choice (self.proxies)

@@ -1,5 +1,6 @@
 import os
 import random
+import datetime
 from time import sleep
 from threading import Thread
 from api import Api
@@ -64,11 +65,27 @@ class BotsManager ():
                 user = random.choice (stream_users)
                 stream_users.remove (user)
             
+            # Calcualte running time
+            now = datetime.datetime.now()
+            end_time = datetime.datetime.strptime (stream["end_time"], "%H:%M:%S")
+            end_time = end_time.replace (year=now.year, month=now.month, day=now.day)
+            running_time = end_time - now
+            running_seconds = running_time.total_seconds ()
+                        
             streamer = stream["streamer"]
             try:
-                bot = Bot (user["user"], user["cookies"], streamer, self.api.get_proxy(),
-                        headless=HEADLESS, width=WINDOW_WIDTH, height=WINDOW_HEIGHT,
-                        take_screenshots=SCREENSHOTS, bots_running=bots_running[streamer])
+                bot = Bot (
+                    user["user"], 
+                    user["cookies"], 
+                    streamer, 
+                    self.api.get_proxy(),
+                    headless=HEADLESS,
+                    width=WINDOW_WIDTH,
+                    height=WINDOW_HEIGHT,
+                    take_screenshots=SCREENSHOTS, 
+                    bots_running=bots_running[streamer], 
+                    running_seconds=running_seconds,
+                )
             except Exception as e:
                 error = f"{streamer} - {self.username}: Error creating bot instance: {str(e)}\n"
                 print (error)
@@ -106,10 +123,6 @@ class BotsManager ():
                     print (f"\nWaiting 1 minutes before start next {THREADS} bots...\n")
                     sleep (60)
                         
-        # Infinity loop to watch stream
-        print ("Bot running...")
-        while True:
-            sleep (60)
     
     def __auto_run_bot__ (self, bot:Bot):
         """ Run single bot instance, with threading
