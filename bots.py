@@ -23,8 +23,7 @@ class BotsManager ():
         
         
         # Connect to api
-        api = Api ()
-        self.api = api
+        self.api = Api ()
         
         self.streams = self.api.get_streams ()
         
@@ -85,6 +84,7 @@ class BotsManager ():
                     take_screenshots=SCREENSHOTS, 
                     bots_running=bots_running[streamer], 
                     running_seconds=running_seconds,
+                    api = self.api
                 )
             except Exception as e:
                 error = f"{streamer} - {self.username}: Error creating bot instance: {str(e)}\n"

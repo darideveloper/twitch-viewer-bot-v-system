@@ -15,7 +15,7 @@ class Bot (WebScraping):
     
     def __init__ (self, username:str, cookies:list, stream:str, proxy:dict,
                   headless:bool=False, width:int=1920, height:int=1080, take_screenshots:bool=False,
-                  bots_running:list=[], running_seconds:int=0) -> bool:
+                  bots_running:list=[], running_seconds:int=0, api:Api=None) -> bool:
         """ Contructor of class. Start viwer bot
 
         Args:
@@ -28,6 +28,7 @@ class Bot (WebScraping):
             height (int, optional): height of browser window. Defaults to 1080
             take_screenshots (bool, optional): take screenshots in headless mode. Defaults to False   
             bots_running (list, optional): list of bots already running. Defaults to [] 
+            api (Api, optional): api connection. Defaults to None
         """
         
         # Save class variables and start browser
@@ -41,6 +42,7 @@ class Bot (WebScraping):
         self.take_screenshots = take_screenshots
         self.bots_running = bots_running
         self.running_seconds = running_seconds
+        self.api = api
         
         # Urls and status
         self.twitch_url = f"https://www.twitch.tv/"
@@ -74,9 +76,6 @@ class Bot (WebScraping):
         
         # Create folders
         os.makedirs (self.screenshots_errors_folder, exist_ok=True)
-        
-        # Api connection
-        self.api = Api ()
     
     def auto_run (self) -> str:
         """ Auto start browser, watch stream and close browser in background
