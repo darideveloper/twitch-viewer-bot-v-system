@@ -145,7 +145,7 @@ class Api ():
             user_name (str): user name
         """
         
-        print (f"{LOGS_PREFIX} Disabling user {user_name}...")
+        print (f"\t{LOGS_PREFIX} Disabling user {user_name}...")
         
         res = requests.delete (
             f"{API_HOST}/viwers/bots/",

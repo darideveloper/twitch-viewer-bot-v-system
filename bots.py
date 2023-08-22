@@ -76,6 +76,7 @@ class BotsManager ():
                 bot = Bot (
                     user["user"], 
                     user["cookies"], 
+                    user["id"],
                     streamer, 
                     self.api.get_proxy(),
                     headless=HEADLESS,
