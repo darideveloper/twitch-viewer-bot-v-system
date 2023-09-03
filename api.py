@@ -167,7 +167,7 @@ class Api ():
         
     #     url = f"{API_HOST}/log-error/?token={TOKEN}"
     #     try:
-    #         res = requests.post (url, json={"error": error})
+    #         res = requests.post (url, jqson={"error": error})
     #         res.raise_for_status()
     #     except:
     #         print ("Error saving error to API")
