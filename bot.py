@@ -216,6 +216,6 @@ class Bot (WebScraping):
         
     def __kill_bot__ (self): 
         
-        sleep (self.running_seconds)
+        sleep (abs(self.running_seconds))
         print (f"\t({self.stream} - {self.username}) Killing bot...")
         self.end_browser ()
