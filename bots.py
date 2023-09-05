@@ -34,6 +34,9 @@ class BotsManager ():
         
         self.users = self.api.get_users ()
         
+        current_folder = os.path.dirname (__file__)
+        self.log_path = os.path.join (current_folder, ".log")
+        
         # Separator
         print ()
                 
@@ -54,9 +57,10 @@ class BotsManager ():
                                                     
             # Default user
             user = {
-                "name": "no-user",
+                "user": "no-user",
                 "cookies": [],
-                "is_active": True
+                "is_active": True,
+                "id": 0
             }
             
             # Get random user
@@ -88,15 +92,12 @@ class BotsManager ():
                     api = self.api
                 )
             except Exception as e:
-                error = f"{streamer} - {self.username}: Error creating bot instance: {str(e)}\n"
+                error = f"{streamer}: Error creating bot instance: {str(e)}\n"
                 print (error)
                 
                 # Save error details
                 with open (self.log_path, "a", encoding='UTF-8') as file:
                     file.write (error)
-                
-                # Save error in api
-                self.api.log_error (error)
                 
                 quit ()
                 

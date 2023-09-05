@@ -153,9 +153,6 @@ class Bot (WebScraping):
             with open (self.log_path, "a", encoding='UTF-8') as file:
                 file.write (error)
             
-            # Save error in api
-            self.api.log_error (error)
-            
             quit ()
 
         proxy_working = self.__load_twitch__ ()    
