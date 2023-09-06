@@ -54,19 +54,13 @@ class BotsManager ():
             
             # Get current stream
             stream = self.streams[current_stream_id]
-                                                    
-            # Default user
-            user = {
-                "user": "no-user",
-                "cookies": [],
-                "is_active": True,
-                "id": 0
-            }
             
             # Get random user
             if stream_users:
                 user = random.choice (stream_users)
                 stream_users.remove (user)
+            else:
+                continue
             
             # Calcualte running time
             now = datetime.datetime.now()
