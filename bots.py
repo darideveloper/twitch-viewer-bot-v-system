@@ -21,7 +21,6 @@ class BotsManager ():
     
     def __init__ (self):     
         
-        
         # Connect to api
         self.api = Api ()
         
@@ -116,8 +115,8 @@ class BotsManager ():
                     # Wait before next bots
                     current_bots = 0
                     sleep (8)
-                    print (f"\nWaiting 1 minutes before start next {THREADS} bots...\n")
-                    sleep (60)
+                    print (f"\nWaiting 2 minutes before start next {THREADS} bots...\n")
+                    sleep (120)
                         
     
     def __auto_run_bot__ (self, bot:Bot):
