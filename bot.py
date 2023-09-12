@@ -55,19 +55,10 @@ class Bot (WebScraping):
         
         # Css selectors
         self.selectors = {
-            "twitch-logo": 'a[aria-label="Twitch Home"]',
             "twitch-login-btn": 'button[data-a-target="login-button"]',
             'start-stream-btn': 'button[data-a-target*="start-watching"]',
-            'stream-quality-btn': 'button[data-a-target="player-settings-menu-item-quality"]',
-            'stream-160p-btn': '[data-a-target="player-settings-menu"] > div:last-child input[name="player-settings-submenu-quality-option"]',
-            'comment_textarea': '[role="textbox"]',
-            'comment_send_btn': 'button[data-a-target="chat-send-button"]',
-            'comment_accept_btn': 'button[data-test-selector="chat-rules-ok-button"]',
             "offline_status": '.home .channel-status-info.channel-status-info--offline',
-            'stream-menu-btn': 'button[data-a-target="player-settings-button"]',
-            "stream-popout-player": '[data-a-target="player-settings-menu"] > div:nth-child(5) > button',
-            'stream-mature-btn': 'button[data-a-target="player-overlay-mature-accept"]'
-            
+            'player': '.persistent-player',           
         }
         
         # paths
@@ -124,8 +115,11 @@ class Bot (WebScraping):
     def __set_quality_mute__ (self): 
         """ Set video quality to lower and mute stream, with local storage """
         
-        self.set_local_storage ("video-quality", '{"default":"160p30"}')
-        self.set_local_storage ("volume", "0")
+        try:
+            self.set_local_storage ("video-quality", '{"default":"160p30"}')
+            self.set_local_storage ("volume", "0")
+        except:
+            pass
     
     def __start_bot__ (self) -> bool:
         """ Start browser and watch stream
