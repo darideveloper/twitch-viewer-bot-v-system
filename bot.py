@@ -49,8 +49,6 @@ class Bot (WebScraping):
         self.twitch_url = f"https://www.twitch.tv/"
         self.twitch_url_login = f"https://www.twitch.tv/login/"
         self.twitch_url_stream = f"https://www.twitch.tv/{self.stream}"
-        self.twitch_url_pupup = f"https://player.twitch.tv/?channel={self.stream}&enableExtensions=true&muted=true&parent=twitch.tv&player=popout&quality=160p30&volume=0.5"
-        self.twitch_url_chat = f"https://www.twitch.tv/popout/{self.stream}/chat?popout="
         self.status = "running"
         
         # Css selectors
@@ -201,17 +199,16 @@ class Bot (WebScraping):
             sleep (5)
             self.refresh_selenium ()
     
+        # Hide video
+        player = self.get_elems (self.selectors["player"])
+        if player:
+            script = f"document.querySelector ('{self.selectors['player']}').style.display = 'none'"
+            self.driver.execute_script (script)
+    
         # Take screenshot
         if self.take_screenshots:
             screenshot_path = os.path.join(self.screenshots_folder, f"{self.stream} - {self.username}.png")
             self.screenshot (screenshot_path)
-        
-        # Open chat in new tab
-        self.set_page_js (self.twitch_url_chat, new_tab=True)
-        sleep (60)
-        
-        # return to stream tab
-        self.switch_to_tab (0)
         
         return True
         
