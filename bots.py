@@ -62,12 +62,11 @@ class BotsManager ():
             else:
                 break      
             
-            # Calcualte running time
             now = datetime.datetime.now()
             end_time = datetime.datetime.strptime (stream["end_time"], "%H:%M:%S")
             end_time = end_time.replace (year=now.year, month=now.month, day=now.day)
             running_time = end_time - now
-            running_seconds = running_time.total_seconds ()
+            running_seconds = running_time.total_seconds () 
                         
             streamer = stream["streamer"]
             try:
@@ -123,8 +122,6 @@ class BotsManager ():
         
         # Infinity loop to watch stream
         print (">>>>>>>>>> All bots launched...")
-        while True:
-            sleep (60)
     
     def __auto_run_bot__ (self, bot:Bot):
         """ Run single bot instance, with threading
