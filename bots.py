@@ -43,8 +43,9 @@ class BotsManager ():
         for stream in self.streams:
             bots_running[stream["streamer"]] = []
             
-        stream_users = self.users.copy ()
-        
+        # Copy bots for each streamer
+        stream_users =  [self.users.copy (), self.users.copy ()]
+                    
         # Create bots to each stream
         current_stream_id = 0
         bots_total = VIWERS_STREAM*len(self.streams)
@@ -55,11 +56,11 @@ class BotsManager ():
             stream = self.streams[current_stream_id]
             
             # Get random user
-            if stream_users:
-                user = random.choice (stream_users)
-                stream_users.remove (user)
+            if stream_users[current_stream_id]:
+                user = random.choice (stream_users[current_stream_id])
+                stream_users[current_stream_id].remove (user)                
             else:
-                continue
+                break      
             
             # Calcualte running time
             now = datetime.datetime.now()
@@ -114,10 +115,16 @@ class BotsManager ():
                     
                     # Wait before next bots
                     current_bots = 0
-                    sleep (8)
-                    print (f"\nWaiting 2 minutes before start next {THREADS} bots...\n")
-                    sleep (120)
-                        
+                    
+                    # Wait until all bots ends running
+                    status = Bot.bots_status
+                    while not status or "loading" in status:
+                        sleep (5)
+        
+        # Infinity loop to watch stream
+        print (">>>>>>>>>> All bots launched...")
+        while True:
+            sleep (60)
     
     def __auto_run_bot__ (self, bot:Bot):
         """ Run single bot instance, with threading
